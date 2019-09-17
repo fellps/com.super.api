@@ -1,4 +1,5 @@
 import Producer from '../models/producer.model'
+import Result from '../modules/result'
 
 export default {
   // Create producer
@@ -27,8 +28,8 @@ export default {
   // Find all producers
   findAll: (req, res) => {
     Producer.find()
-      .then(products => {
-        res.send(products)
+      .then(producers => {
+        return Result.Success.SuccessOnSearch(res, producers)
       }).catch(err => {
         res.status(500).send({
           message: err.message || 'Something wrong while retrieving products.'
@@ -36,18 +37,18 @@ export default {
       })
   },
 
-  // Find one producer
-  findOne: (req, res) => {
+  // // Find one producer
+  // findOne: (req, res) => {
 
-  },
+  // },
 
-  // Update producer
-  update: (req, res) => {
+  // // Update producer
+  // update: (req, res) => {
 
-  },
+  // },
 
-  // Delete producer
-  delete: (req, res) => {
+  // // Delete producer
+  // delete: (req, res) => {
 
-  }
+  // }
 }
