@@ -1,5 +1,5 @@
 import mongoose from 'mongoose'
-import EventSchema from './event.model'
+import { EventSchema } from './event.model'
 
 const ProducerSchema = mongoose.Schema({
   socialReason: String,

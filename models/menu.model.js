@@ -1,11 +1,11 @@
 import mongoose from 'mongoose'
-import ProductSchema from './product.model.js'
+import { ProductSchema } from './product.model.js'
 
-const MenuSchema = mongoose.Schema({
+export const MenuSchema = mongoose.Schema({
   name: String,
   products: [ProductSchema]
 }, {
   timestamps: true
 })
 
-export default MenuSchema
+export default mongoose.model('Menu', MenuSchema)

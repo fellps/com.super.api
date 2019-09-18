@@ -1,6 +1,6 @@
 import mongoose from 'mongoose'
 
-const ProductSchema = mongoose.Schema({
+export const ProductSchema = mongoose.Schema({
   name: String,
   value: Number, 
   color: String
@@ -8,4 +8,4 @@ const ProductSchema = mongoose.Schema({
   timestamps: true
 })
 
-export default ProductSchema
+export default mongoose.model('Product', ProductSchema)

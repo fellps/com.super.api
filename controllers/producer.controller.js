@@ -56,7 +56,7 @@ export default {
   },
 
   // Update producer
-  update: (req, res) => {
+  update: async (req, res) => {
     if(!req.body) {
       return Result.Error.RequiredBody(res)
     }
@@ -87,7 +87,7 @@ export default {
   },
 
   // Delete producer
-  delete: (req, res) => {
+  delete: async (req, res) => {
     Producer.findByIdAndRemove(req.params.producerId)
       .then(producer => {
         if(!producer) {
