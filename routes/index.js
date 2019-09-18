@@ -1,13 +1,17 @@
 import express from 'express'
-import producer from './producer.route'
-import event from './event.route'
+import Producer from './producer.route'
+import Event from './event.route'
+import Menu from './menu.route'
+import Result from '../modules/result'
 
 const app = express()
 
-app.get('/', (req, res) => {
-  res.json({ message: 'Welcome to Super API' })
-})
-  .use('/producers', producer)
-  .use('/events', event)
+app
+  .get('/', (req, res) => {
+    return Result.Success.ApiSuccess(res)
+  })
+  .use('/producers', Producer)
+  .use('/events', Event)
+  .use('/menus', Menu)
 
 export default app

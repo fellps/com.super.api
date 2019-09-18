@@ -1,4 +1,5 @@
 export default {
+  ApiSuccess: 'Bem vindo a API Super',
   // ACCESS
   AccessDenied: 'Acesso Negado',
   BlockedUser: 'Usuário Bloqueado!',
