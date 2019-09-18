@@ -10,7 +10,7 @@ const basicResult = {
 const _success = (code, res, resultData = {}) => {
   const result = {
     ...basicResult,
-    ...resultData,
+    data: resultData,
     message: Messages[code] || 'Server Problem'
   }
   return res.status(200).send(result)
@@ -19,20 +19,19 @@ const _success = (code, res, resultData = {}) => {
 const _error = (code, res, resultData = {}) => {
   const result = {
     ...basicResult,
-    ...resultData,
+    data: resultData,
     error: true,
     errorCode: code,
     errorMessage: code,
     message: Messages[code] || 'Server Problem',
   }
-  
   return res.status(400).send(result)
 }
 
 const _unauthorized = (code, res, resultData = {}) => {
   const result = {
     ...basicResult,
-    ...resultData,
+    data: resultData,
     error: true,
     errorCode: code,
     errorMessage: code,
@@ -44,7 +43,7 @@ const _unauthorized = (code, res, resultData = {}) => {
 const _warning = (code, res, resultData = {}) => {
   const result = {
     ...basicResult,
-    ...resultData,
+    data: resultData,
     error: true,
     errorCode: code,
     errorMessage: code,
@@ -53,10 +52,34 @@ const _warning = (code, res, resultData = {}) => {
   return res.status(200).send(result)
 }
 
+const _notFound = (code, res, resultData = {}) => {
+  const result = {
+    ...basicResult,
+    data: resultData,
+    error: true,
+    errorCode: code,
+    errorMessage: code,
+    message: Messages[code] || 'Server Problem',
+  }
+  return res.status(404).send(result)
+}
+
+const _internalError = (code, res, resultData = {}) => {
+  const result = {
+    ...basicResult,
+    data: resultData,
+    error: true,
+    errorCode: code,
+    errorMessage: code,
+    message: Messages[code] || 'Server Problem',
+  }
+  return res.status(500).send(result)
+}
+
 const _forbidden = (code, res, resultData = {}) => {
   const result = {
     ...basicResult,
-    ...resultData,
+    data: resultData,
     error: true,
     errorCode: code,
     errorMessage: code,
@@ -64,7 +87,7 @@ const _forbidden = (code, res, resultData = {}) => {
   }
   return res.status(403).send(result)
 }
-  
+
 const mapMessages = (fn) => {
   return _.mapValues(Messages, (o, code) => (res, resultData) => fn(code, res, resultData))
 }
@@ -73,6 +96,8 @@ const Result = {
   Error: mapMessages(_error),
   Success: mapMessages(_success),
   Warning: mapMessages(_warning),
+  NotFound: mapMessages(_notFound),
+  InternalError: mapMessages(_internalError),
   Unauthorized: mapMessages(_unauthorized),
   Forbidden: mapMessages(_forbidden)
 }

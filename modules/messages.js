@@ -7,6 +7,7 @@ export default {
   ErrorOnRequest: 'Erro na requisição tente novamente mais tarde ou entre em contato com administrador',
   ErrorOnSave: 'Ocorreu um erro ao salvar o registro(s)',
   ErrorOnOperation: 'Operação não realizada',
+  ErrorOnSearch: 'Erro ao buscar registro',
   // NO RECORDS
   NoRecordsFound: 'Nenhum registro encontrado',
   NoRecordsToUpdate: 'Nenhum dado novo para atualizar',
@@ -15,6 +16,7 @@ export default {
   NotFoundUser: 'Usuário não encontrado',
   // REQUIRED
   RequiredName: 'Nome é obrigatório',
+  RequiredBody: 'Nenhum campo informado!',
   // SUCCESS
   SuccessOnChangePassword: 'Senha alterada com sucesso',
   SuccessOnLogin: 'Usuário logado',
