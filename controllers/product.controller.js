@@ -14,7 +14,7 @@ export default {
     },
     {
       $push: {
-        'events.$.menus': req.body
+        'events.$.products': req.body
       }
     },
     (err) => {
@@ -34,7 +34,7 @@ export default {
           return Result.NotFound.NoRecordsFound(res)
         }
         const event = producer.events.id(req.params.eventId)
-        return Result.Success.SuccessOnSearch(res, event.menus)
+        return Result.Success.SuccessOnSearch(res, event.products)
       }).catch(err => {
         if(err.kind === 'ObjectId') {
           return Result.NotFound.NoRecordsFound(res)
@@ -46,14 +46,14 @@ export default {
   // Find one event
   findOne: async (req, res) => {
     Producer.findOne({
-      'events.menus._id': req.params.menuId
+      'events.products._id': req.params.productId
     }, 'events.$')
       .then(producer => {
         if(!producer && !producer.events[0]) {
           return Result.NotFound.NoRecordsFound(res)
         }
-        const menu = producer.events[0].menus.id(req.params.menuId)
-        return Result.Success.SuccessOnSearch(res, menu)
+        const products = producer.events[0].products.id(req.params.productId)
+        return Result.Success.SuccessOnSearch(res, products)
       }).catch(err => {
         if(err.kind === 'ObjectId') {
           return Result.NotFound.NoRecordsFound(res)
@@ -72,13 +72,14 @@ export default {
       {}, 
       { 
         $set: {
-          'events.$[].menus.$[menu].name': req.body.name,
-          'events.$[].menus.$[menu].products': JSON.parse(req.body.products) 
+          'events.$[].products.$[product].name': req.body.name,
+          'events.$[].products.$[product].value': req.body.value,
+          'events.$[].products.$[product].color': req.body.color
         }
       },
       {
         arrayFilters: [{ 
-          'menu._id': req.params.menuId
+          'product._id': req.params.productId
         }]
       }, (err) => {
         if (err) 
@@ -90,10 +91,10 @@ export default {
   // Delete event
   delete: async (req, res) => {
     Producer.updateOne({ 
-      'events.menus._id': req.params.menuId
+      'events.products._id': req.params.productId
     }, { 
       $pull: { 
-        'events.$.menus': { '_id': req.params.menuId } 
+        'events.$.products': { '_id': req.params.productId } 
       }
     },
     (err, numAffected) => {

@@ -1,5 +1,6 @@
 import mongoose from 'mongoose'
 import { MenuSchema } from './menu.model'
+import { ProductSchema } from './product.model'
 import { DeviceSchema } from './device.model'
 
 export const EventSchema = mongoose.Schema({
@@ -12,6 +13,7 @@ export const EventSchema = mongoose.Schema({
   address: String,
   addressNumber: Number,
   menus: [MenuSchema],
+  products: [ProductSchema],
   devices: [DeviceSchema]
 }, {
   timestamps: true
