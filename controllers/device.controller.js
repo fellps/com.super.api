@@ -3,7 +3,7 @@ import Result from '../modules/result'
 import _ from 'lodash'
 
 export default {
-  // Create event
+  // Create device
   create: async (req, res) => {
     if(_.isEmpty(req.body)) {
       return Result.Error.RequiredBody(res)
@@ -29,7 +29,7 @@ export default {
     })
   },
 
-  // Find all events
+  // Find all devices
   findAll: async (req, res) => {
     Producer.findOne({
       'events._id': req.params.eventId
@@ -48,7 +48,7 @@ export default {
       })
   },
 
-  // Find one event
+  // Find one device
   findOne: async (req, res) => {
     Producer.findOne({
       'events.devices._id': req.params.deviceId
@@ -67,7 +67,7 @@ export default {
       })
   },
 
-  // Update event
+  // Update device
   update: async (req, res) => {
     if(!req.body) {
       return Result.Error.RequiredBody(res)
@@ -92,7 +92,7 @@ export default {
       })
   },
 
-  // Delete event
+  // Delete device
   delete: async (req, res) => {
     Producer.updateOne({ 
       'events.devices._id': req.params.deviceId

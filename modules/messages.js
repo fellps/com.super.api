@@ -10,6 +10,7 @@ export default {
   ErrorOnSave: 'Ocorreu um erro ao salvar o registro(s)',
   ErrorOnOperation: 'Operação não realizada',
   ErrorOnSearch: 'Erro ao buscar registro',
+  ErrorOnLogin: 'Usuário ou senha inválidos',
   // NO RECORDS
   NoRecordsFound: 'Nenhum registro encontrado',
   NoRecordsToUpdate: 'Nenhum dado novo para atualizar',
@@ -19,9 +20,11 @@ export default {
   // REQUIRED
   RequiredName: 'Nome é obrigatório',
   RequiredBody: 'Nenhum campo informado!',
+  RequiredLogin: 'Efetue o login antes de continuar!',
   // SUCCESS
   SuccessOnChangePassword: 'Senha alterada com sucesso',
   SuccessOnLogin: 'Usuário logado',
+  SuccessOnLogout: 'Usuário deslogado',
   SuccessOnRemove: 'Registro(s) removido com sucesso',
   SuccessOnLogicalRemove: 'Registro(s) removido com sucesso',
   SuccessOnSave: 'Registro(s) salvo com sucesso',

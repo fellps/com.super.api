@@ -3,7 +3,7 @@ import Result from '../modules/result'
 import _ from 'lodash'
 
 export default {
-  // Create event
+  // Create product
   create: async (req, res) => {
     if(_.isEmpty(req.body)) {
       return Result.Error.RequiredBody(res)
@@ -24,7 +24,7 @@ export default {
     })
   },
 
-  // Find all events
+  // Find all products
   findAll: async (req, res) => {
     Producer.findOne({
       'events._id': req.params.eventId
@@ -43,7 +43,7 @@ export default {
       })
   },
 
-  // Find one event
+  // Find one product
   findOne: async (req, res) => {
     Producer.findOne({
       'events.products._id': req.params.productId
@@ -62,7 +62,7 @@ export default {
       })
   },
 
-  // Update event
+  // Update product
   update: async (req, res) => {
     if(!req.body) {
       return Result.Error.RequiredBody(res)
@@ -88,7 +88,7 @@ export default {
       })
   },
 
-  // Delete event
+  // Delete product
   delete: async (req, res) => {
     Producer.updateOne({ 
       'events.products._id': req.params.productId
