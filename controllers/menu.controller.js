@@ -9,25 +9,26 @@ export default {
       return Result.Error.RequiredBody(res)
     }
 
-    Producer.update(
-      { 'events._id': req.params.eventId },
-      {
-        $push: {
-          'events.$.menus': req.body
-        }
-      },
-      (err) => {
-        if (err) return Result.Error.ErrorOnSave(res)
-        return Result.Success.SuccessOnSave(res)
+    Producer.updateOne({ 
+      'events._id': req.params.eventId 
+    },
+    {
+      $push: {
+        'events.$.menus': req.body
       }
-    )
+    },
+    (err) => {
+      if (err) 
+        return Result.Error.ErrorOnSave(res)
+      return Result.Success.SuccessOnSave(res)
+    })
   },
 
   // Find all events
   findAll: async (req, res) => {
     Producer.findOne({
       'events._id': req.params.eventId
-    })
+    }, 'events.$')
       .then(producer => {
         if(!producer) {
           return Result.NotFound.NoRecordsFound(res)
@@ -45,19 +46,19 @@ export default {
   // Find one event
   findOne: async (req, res) => {
     Producer.findOne({
-      'events._id': req.params.eventId
-    })
+      'events.menus._id': req.params.menuId
+    }, 'events.$')
       .then(producer => {
-        if(!producer) {
+        if(!producer && !producer.events[0]) {
           return Result.NotFound.NoRecordsFound(res)
         }
-        const event = producer.events.id(req.params.eventId)
-        return Result.Success.SuccessOnSearch(res, event)
+        const menu = producer.events[0].menus.id(req.params.menuId)
+        return Result.Success.SuccessOnSearch(res, menu)
       }).catch(err => {
         if(err.kind === 'ObjectId') {
           return Result.NotFound.NoRecordsFound(res)
         }
-        return Result.Error.ErrorOnSearch(res)
+        return Result.Error.ErrorOnSearch(res, err.message)
       })
   },
 
@@ -67,48 +68,40 @@ export default {
       return Result.Error.RequiredBody(res)
     }
 
-    Producer.findOneAndUpdate({
-      'events._id': req.params.eventId
-    }, {
-      'events.$.name': req.body.name,
-      'events.$.startDate': req.body.startDate,
-      'events.$.endDate': req.body.endDate,
-      'events.$.cep': req.body.cep,
-      'events.$.state': req.body.state,
-      'events.$.city': req.body.city,
-      'events.$.address': req.body.address,
-      'events.$.addressNumber': req.body.addressNumber
-    })
-      .then(producer => {
-        if(!producer) {
-          return Result.NotFound.NoRecordsFound(res)
+    Producer.updateMany(
+      {}, 
+      { 
+        $set: {
+          'events.$[].menus.$[menu].name': req.body.name,
+          'events.$[].menus.$[menu].products': JSON.parse(req.body.products) 
         }
+      },
+      {
+        arrayFilters: [{ 
+          'menu._id': req.params.menuId
+        }]
+      }, (err) => {
+        if (err) 
+          return Result.Error.ErrorOnUpdate(res)
         return Result.Success.SuccessOnUpdate(res)
-      }).catch(err => {
-        if(err.kind === 'ObjectId') {
-          return Result.NotFound.NoRecordsFound(res)
-        }
-        return Result.Error.ErrorOnSearch(res)
       })
   },
 
   // Delete event
   delete: async (req, res) => {
-    Producer.findOne({
-      'events._id': req.params.eventId
+    Producer.updateOne({ 
+      'events.menus._id': req.params.menuId
+    }, { 
+      $pull: { 
+        'events.$.menus': { '_id': req.params.menuId } 
+      }
+    },
+    (err, numAffected) => {
+      if (err) 
+        return Result.Error.ErrorOnRemove(res)
+      if (numAffected.nModified > 0)
+        return Result.Success.SuccessOnRemove(res, numAffected)
+      return Result.Error.ErrorOnRemove(res)
     })
-      .then(producer => {
-        if(!producer) {
-          return Result.NotFound.NoRecordsFound(res)
-        }
-        producer.events.id(req.params.eventId).remove()
-        producer.save()
-        return Result.Success.SuccessOnRemove(res)
-      }).catch(err => {
-        if(err.kind === 'ObjectId' || err.name === 'NotFound') {
-          return Result.NotFound.NoRecordsFound(res)                         
-        }
-        return Result.InternalError.ErrorOnOperation(res)
-      })
   }
 }

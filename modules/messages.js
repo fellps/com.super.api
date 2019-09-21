@@ -5,6 +5,7 @@ export default {
   BlockedUser: 'Usuário Bloqueado!',
   // ERRORS
   ErrorOnRemove: 'Ocorreu um erro na remoção do registro(s)',
+  ErrorOnUpdate: 'Ocorreu um erro ao atualizar o(s) registro(s)',
   ErrorOnRequest: 'Erro na requisição tente novamente mais tarde ou entre em contato com administrador',
   ErrorOnSave: 'Ocorreu um erro ao salvar o registro(s)',
   ErrorOnOperation: 'Operação não realizada',

@@ -54,7 +54,7 @@ export default {
   findOne: async (req, res) => {
     Producer.findOne({
       'events._id': req.params.eventId
-    })
+    }, 'events.$')
       .then(producer => {
         if(!producer) {
           return Result.NotFound.NoRecordsFound(res)

@@ -3,7 +3,7 @@ import menu from '../controllers/menu.controller'
 
 const app = express()
 
-app.get('/:eventId/menus', menu.findAll)
+app.get('/:eventId/list', menu.findAll)
 app.post('/:eventId', menu.create)
 app.get('/:menuId', menu.findOne)
 app.put('/:menuId', menu.update)

@@ -24,8 +24,8 @@ export default {
     producer.save()
       .then(producer => {
         return Result.Success.SuccessOnSave(res, producer)
-      }).catch(() => {
-        return Result.Error.ErrorOnSave(res)
+      }).catch((err) => {
+        return Result.Error.ErrorOnSave(res, err.message)
       })
   },
 
@@ -81,7 +81,6 @@ export default {
         if(err.kind === 'ObjectId') {
           return Result.NotFound.NoRecordsFound(res)           
         }
-        console.log(err)
         return Result.InternalError.ErrorOnOperation(res)
       })
   },

@@ -3,7 +3,7 @@ import event from '../controllers/event.controller'
 
 const app = express()
 
-app.get('/:producerId/events', event.findAll)
+app.get('/:producerId/list', event.findAll)
 app.post('/:producerId', event.create)
 app.get('/:eventId', event.findOne)
 app.put('/:eventId', event.update)
