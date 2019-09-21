@@ -2,7 +2,7 @@ import mongoose from 'mongoose'
 
 export const DeviceSchema = mongoose.Schema({
   name: String,
-  menus: []
+  menusIds: []
 }, {
   timestamps: true
 })

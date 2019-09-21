@@ -9,7 +9,7 @@ export default {
       return Result.Error.RequiredBody(res)
     }
 
-    Producer.updateOne({ 
+    Producer.updateOne({
       'events._id': req.params.eventId 
     },
     {

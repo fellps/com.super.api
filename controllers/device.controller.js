@@ -9,9 +9,9 @@ export default {
       return Result.Error.RequiredBody(res)
     }
 
-    const menu = {
+    const device = {
       name: req.body.name,
-      productsIds: JSON.parse(req.body.productsIds)
+      menusIds: JSON.parse(req.body.menusIds)
     }
 
     Producer.updateOne({ 
@@ -19,7 +19,7 @@ export default {
     },
     {
       $push: {
-        'events.$.menus': menu
+        'events.$.devices': device
       }
     },
     (err) => {
@@ -39,7 +39,7 @@ export default {
           return Result.NotFound.NoRecordsFound(res)
         }
         const event = producer.events.id(req.params.eventId)
-        return Result.Success.SuccessOnSearch(res, event.menus)
+        return Result.Success.SuccessOnSearch(res, event.devices)
       }).catch(err => {
         if(err.kind === 'ObjectId') {
           return Result.NotFound.NoRecordsFound(res)
@@ -51,14 +51,14 @@ export default {
   // Find one event
   findOne: async (req, res) => {
     Producer.findOne({
-      'events.menus._id': req.params.menuId
+      'events.devices._id': req.params.deviceId
     }, 'events.$')
       .then(producer => {
         if(!producer && !producer.events[0]) {
           return Result.NotFound.NoRecordsFound(res)
         }
-        const menu = producer.events[0].menus.id(req.params.menuId)
-        return Result.Success.SuccessOnSearch(res, menu)
+        const devices = producer.events[0].devices.id(req.params.deviceId)
+        return Result.Success.SuccessOnSearch(res, devices)
       }).catch(err => {
         if(err.kind === 'ObjectId') {
           return Result.NotFound.NoRecordsFound(res)
@@ -74,16 +74,16 @@ export default {
     }
 
     Producer.updateMany(
-      {}, 
+      {},
       { 
         $set: {
-          'events.$[].menus.$[menu].name': req.body.name,
-          'events.$[].menus.$[menu].products': JSON.parse(req.body.products) 
+          'events.$[].devices.$[device].name': req.body.name,
+          'events.$[].devices.$[device].menusIds': JSON.parse(req.body.menusIds)
         }
       },
       {
         arrayFilters: [{ 
-          'menu._id': req.params.menuId
+          'device._id': req.params.deviceId
         }]
       }, (err) => {
         if (err) 
@@ -95,10 +95,10 @@ export default {
   // Delete event
   delete: async (req, res) => {
     Producer.updateOne({ 
-      'events.menus._id': req.params.menuId
+      'events.devices._id': req.params.deviceId
     }, { 
       $pull: { 
-        'events.$.menus': { '_id': req.params.menuId } 
+        'events.$.devices': { '_id': req.params.deviceId } 
       }
     },
     (err, numAffected) => {

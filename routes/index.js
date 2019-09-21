@@ -3,6 +3,7 @@ import Producer from './producer.route'
 import Event from './event.route'
 import Menu from './menu.route'
 import Product from './product.route'
+import Device from './device.route'
 import Result from '../modules/result'
 
 const app = express()
@@ -15,5 +16,6 @@ app
   .use('/events', Event)
   .use('/menus', Menu)
   .use('/products', Product)
+  .use('/devices', Device)
 
 export default app
