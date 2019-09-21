@@ -63,7 +63,7 @@ export default {
         if(err.kind === 'ObjectId') {
           return Result.NotFound.NoRecordsFound(res)
         }
-        return Result.Error.ErrorOnSearch(res, err.message)
+        return Result.Error.ErrorOnSearch(res)
       })
   },
 

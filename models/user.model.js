@@ -2,11 +2,11 @@ import mongoose from 'mongoose'
 
 export const UserSchema = mongoose.Schema({
   name: String,
-  cpf: Number,
+  cpf: { type: Number, select: false },
   birthdate: Date,
   email: String,
   phone: Number,
-  password: String
+  password: { type: String, select: false }
 }, {
   timestamps: true
 })

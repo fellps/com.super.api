@@ -1,27 +1,29 @@
-import Producer from '../models/producer.model'
+import User from '../models/user.model'
 import Result from '../modules/result'
+import Crypto from 'crypto'
 import _ from 'lodash'
 
 export default {
-  // Create producer
+  // Create user
   create: async (req, res) => {
     if(_.isEmpty(req.body)) {
       return Result.Error.RequiredBody(res)
     }
 
-    const producer = new Producer({
-      socialReason: req.body.socialReason,
-      cnpj: req.body.cnpj,
-      cep: req.body.cep,
-      state: req.body.state,
-      city: req.body.city,
-      address: req.body.address,
-      addressNumber: req.body.addressNumber,
+    const hash = Crypto.createHmac('sha256', process.env.PASSWORD_SECRET)
+      .update(req.body.password)
+      .digest('hex')
+
+    const user = new User({
+      name: req.body.name,
+      cpf: req.body.cpf,
+      birthdate: req.body.birthdate,
       email: req.body.email,
-      phone: req.body.phone
+      phone: req.body.phone,
+      password: hash
     })
 
-    producer.save()
+    user.save()
       .then(() => {
         return Result.Success.SuccessOnSave(res)
       }).catch(() => {
@@ -29,24 +31,24 @@ export default {
       })
   },
 
-  // Find all producers
+  // Find all users
   findAll: async (req, res) => {
-    Producer.find()
-      .then(producers => {
-        return Result.Success.SuccessOnSearch(res, producers)
+    User.find()
+      .then(users => {
+        return Result.Success.SuccessOnSearch(res, users)
       }).catch(() => {
         return Result.Success.NoRecordsFound(res)
       })
   },
 
-  // Find one producer
+  // Find one user
   findOne: async (req, res) => {
-    Producer.findById(req.params.producerId)
-      .then(producer => {
-        if(!producer) {
+    User.findById(req.params.userId)
+      .then(user => {
+        if(!user) {
           return Result.NotFound.NoRecordsFound(res)           
         }
-        return Result.Success.SuccessOnSearch(res, producer)
+        return Result.Success.SuccessOnSearch(res, user)
       }).catch(err => {
         if(err.kind === 'ObjectId') {
           return Result.NotFound.NoRecordsFound(res)
@@ -55,25 +57,26 @@ export default {
       })
   },
 
-  // Update producer
+  // Update user
   update: async (req, res) => {
     if(!req.body) {
       return Result.Error.RequiredBody(res)
     }
 
-    Producer.findByIdAndUpdate(req.params.producerId, {
-      socialReason: req.body.socialReason,
-      cnpj: req.body.cnpj,
-      cep: req.body.cep,
-      state: req.body.state,
-      city: req.body.city,
-      address: req.body.address,
-      addressNumber: req.body.addressNumber,
+    const hash = Crypto.createHmac('sha256', process.env.PASSWORD_SECRET)
+      .update(req.body.password)
+      .digest('hex')
+
+    User.findByIdAndUpdate(req.params.userId, {
+      name: req.body.name,
+      cpf: req.body.cpf,
+      birthdate: req.body.birthdate,
       email: req.body.email,
-      phone: req.body.phone
+      phone: req.body.phone,
+      password: hash
     }, { new: true })
-      .then(producer => {
-        if(!producer) {
+      .then(user => {
+        if(!user) {
           return Result.NotFound.NoRecordsFound(res)
         }
         return Result.Success.SuccessOnUpdate(res)
@@ -85,11 +88,11 @@ export default {
       })
   },
 
-  // Delete producer
+  // Delete user
   delete: async (req, res) => {
-    Producer.findByIdAndRemove(req.params.producerId)
-      .then(producer => {
-        if(!producer) {
+    User.findByIdAndRemove(req.params.userId)
+      .then(user => {
+        if(!user) {
           return Result.NotFound.NoRecordsFound(res)
         }
         return Result.Success.SuccessOnRemove(res)
