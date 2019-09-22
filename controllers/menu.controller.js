@@ -15,7 +15,8 @@ export default {
     }
 
     Producer.updateOne({ 
-      'events._id': req.params.eventId 
+      'events._id': req.params.eventId,
+      'userId': req.userId
     },
     {
       $push: {
@@ -32,7 +33,8 @@ export default {
   // Find all menus
   findAll: async (req, res) => {
     Producer.findOne({
-      'events._id': req.params.eventId
+      'events._id': req.params.eventId,
+      'userId': req.userId
     }, 'events.$')
       .then(producer => {
         if(!producer) {
@@ -51,7 +53,8 @@ export default {
   // Find one menu
   findOne: async (req, res) => {
     Producer.findOne({
-      'events.menus._id': req.params.menuId
+      'events.menus._id': req.params.menuId,
+      'userId': req.userId
     }, 'events.$')
       .then(producer => {
         if(!producer && !producer.events[0]) {
@@ -83,7 +86,8 @@ export default {
       },
       {
         arrayFilters: [{ 
-          'menu._id': req.params.menuId
+          'menu._id': req.params.menuId,
+          'userId': req.userId
         }]
       }, (err) => {
         if (err) 
@@ -95,7 +99,8 @@ export default {
   // Delete menu
   delete: async (req, res) => {
     Producer.updateOne({ 
-      'events.menus._id': req.params.menuId
+      'events.menus._id': req.params.menuId,
+      'userId': req.userId
     }, { 
       $pull: { 
         'events.$.menus': { '_id': req.params.menuId } 

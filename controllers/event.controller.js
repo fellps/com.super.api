@@ -9,7 +9,10 @@ export default {
       return Result.Error.RequiredBody(res)
     }
 
-    Producer.findById(req.params.producerId)
+    Producer.findOne({
+      _id: req.params.producerId,
+      userId: req.userId
+    })
       .then(producer => {
         if(!producer) {
           return Result.NotFound.NoRecordsFound(res)           
@@ -36,7 +39,10 @@ export default {
 
   // Find all events
   findAll: async (req, res) => {
-    Producer.findById(req.params.producerId)
+    Producer.findOne({
+      _id: req.params.producerId,
+      userId: req.userId
+    })
       .then(producer => {
         if(!producer) {
           return Result.NotFound.NoRecordsFound(res)
@@ -53,7 +59,8 @@ export default {
   // Find one event
   findOne: async (req, res) => {
     Producer.findOne({
-      'events._id': req.params.eventId
+      'events._id': req.params.eventId,
+      'userId': req.userId
     }, 'events.$')
       .then(producer => {
         if(!producer) {
@@ -76,7 +83,8 @@ export default {
     }
 
     Producer.findOneAndUpdate({
-      'events._id': req.params.eventId
+      'events._id': req.params.eventId,
+      'userId': req.userId
     }, {
       'events.$.name': req.body.name,
       'events.$.startDate': req.body.startDate,
@@ -103,7 +111,8 @@ export default {
   // Delete event
   delete: async (req, res) => {
     Producer.findOne({
-      'events._id': req.params.eventId
+      'events._id': req.params.eventId,
+      'userId': req.userId
     })
       .then(producer => {
         if(!producer) {

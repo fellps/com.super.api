@@ -18,7 +18,8 @@ export default {
       address: req.body.address,
       addressNumber: req.body.addressNumber,
       email: req.body.email,
-      phone: req.body.phone
+      phone: req.body.phone,
+      userId: req.userId
     })
 
     producer.save()
@@ -41,7 +42,10 @@ export default {
 
   // Find one producer
   findOne: async (req, res) => {
-    Producer.findById(req.params.producerId)
+    Producer.find({
+      _id: req.params.producerId,
+      userId: req.userId
+    })
       .then(producer => {
         if(!producer) {
           return Result.NotFound.NoRecordsFound(res)           
@@ -61,7 +65,10 @@ export default {
       return Result.Error.RequiredBody(res)
     }
 
-    Producer.findByIdAndUpdate(req.params.producerId, {
+    Producer.findOneAndUpdate({
+      _id: req.params.producerId,
+      userId: req.userId
+    }, {
       socialReason: req.body.socialReason,
       cnpj: req.body.cnpj,
       cep: req.body.cep,
@@ -70,7 +77,8 @@ export default {
       address: req.body.address,
       addressNumber: req.body.addressNumber,
       email: req.body.email,
-      phone: req.body.phone
+      phone: req.body.phone,
+      userId: req.userId
     }, { new: true })
       .then(producer => {
         if(!producer) {
@@ -87,7 +95,10 @@ export default {
 
   // Delete producer
   delete: async (req, res) => {
-    Producer.findByIdAndRemove(req.params.producerId)
+    Producer.findOneAndRemove({
+      _id: req.params.producerId,
+      userId: req.userId
+    })
       .then(producer => {
         if(!producer) {
           return Result.NotFound.NoRecordsFound(res)

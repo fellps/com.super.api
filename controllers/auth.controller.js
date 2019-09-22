@@ -23,8 +23,7 @@ export default {
         if(_.isEmpty(user)) {
           return Result.NotFound.ErrorOnLogin(res)           
         }
-
-        const id = user.id
+        const id = user.shift().id
         const result = {
           auth: true,
           token: Jwt.sign({ id }, process.env.JWT_SECRET, {

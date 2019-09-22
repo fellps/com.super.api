@@ -1,7 +1,9 @@
 import Jwt from 'jsonwebtoken'
 import Result from './result'
+import User from '../models/user.model'
+import _ from 'lodash'
 
-export default function verifyJWT(req, res, next) {
+const verifyJWT = (req, res, next) => {
   var token = req.headers['x-access-token']
   if (!token)
     return Result.Unauthorized.RequiredLogin(res)
@@ -11,7 +13,40 @@ export default function verifyJWT(req, res, next) {
       return Result.NotFound.ErrorOnLogin(res)  
 
     // se tudo estiver ok, salva no request para uso posterior
+
     req.userId = decoded.id
     next()
   })
 }
+
+export const verifyAdminJWT = (req, res, next) => {
+  var token = req.headers['x-access-token']
+  if (!token)
+    return Result.Unauthorized.RequiredLogin(res)
+    
+  Jwt.verify(token, process.env.JWT_SECRET, function(err, decoded) {
+    if (err)
+      return Result.NotFound.ErrorPermission(res)  
+
+    User.findById(decoded.id)
+      .then(user => {
+        if(!user) {
+          return Result.Unauthorized.ErrorPermission(res)
+        }
+        
+        const isAdmin = _.some(user.roles, (role) => {
+          return role === 'ADMIN'
+        })
+
+        if (!isAdmin)
+          return Result.Unauthorized.ErrorPermission(res)
+
+        req.userId = decoded.id
+        next()
+      }).catch(() => {
+        return Result.Unauthorized.RequiredLogin(res)
+      })
+  })
+}
+
+export default verifyJWT

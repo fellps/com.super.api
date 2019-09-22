@@ -10,7 +10,8 @@ export default {
     }
 
     Producer.updateOne({
-      'events._id': req.params.eventId 
+      'events._id': req.params.eventId,
+      'userId': req.userId
     },
     {
       $push: {
@@ -27,7 +28,8 @@ export default {
   // Find all products
   findAll: async (req, res) => {
     Producer.findOne({
-      'events._id': req.params.eventId
+      'events._id': req.params.eventId,
+      'userId': req.userId
     }, 'events.$')
       .then(producer => {
         if(!producer) {
@@ -46,7 +48,8 @@ export default {
   // Find one product
   findOne: async (req, res) => {
     Producer.findOne({
-      'events.products._id': req.params.productId
+      'events.products._id': req.params.productId,
+      'userId': req.userId
     }, 'events.$')
       .then(producer => {
         if(!producer && !producer.events[0]) {
@@ -79,7 +82,8 @@ export default {
       },
       {
         arrayFilters: [{ 
-          'product._id': req.params.productId
+          'product._id': req.params.productId,
+          'userId': req.userId
         }]
       }, (err) => {
         if (err) 
@@ -91,7 +95,8 @@ export default {
   // Delete product
   delete: async (req, res) => {
     Producer.updateOne({ 
-      'events.products._id': req.params.productId
+      'events.products._id': req.params.productId,
+      'userId': req.userId
     }, { 
       $pull: { 
         'events.$.products': { '_id': req.params.productId } 

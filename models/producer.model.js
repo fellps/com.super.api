@@ -11,7 +11,8 @@ export const ProducerSchema = mongoose.Schema({
   addressNumber: Number,
   email: String,
   phone: Number,
-  events: [EventSchema]
+  events: [EventSchema],
+  userId: String
 }, {
   timestamps: true
 })

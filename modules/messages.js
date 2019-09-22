@@ -11,6 +11,7 @@ export default {
   ErrorOnOperation: 'Operação não realizada',
   ErrorOnSearch: 'Erro ao buscar registro',
   ErrorOnLogin: 'Usuário ou senha inválidos',
+  ErrorPermission: 'Você não possui acesso! Entre em contato com o suporte!',
   // NO RECORDS
   NoRecordsFound: 'Nenhum registro encontrado',
   NoRecordsToUpdate: 'Nenhum dado novo para atualizar',

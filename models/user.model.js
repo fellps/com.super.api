@@ -6,7 +6,8 @@ export const UserSchema = mongoose.Schema({
   birthdate: Date,
   email: String,
   phone: Number,
-  password: { type: String, select: false }
+  password: { type: String, select: false },
+  roles: Array
 }, {
   timestamps: true
 })

@@ -15,7 +15,8 @@ export default {
     }
 
     Producer.updateOne({ 
-      'events._id': req.params.eventId 
+      'events._id': req.params.eventId,
+      'userId': req.userId
     },
     {
       $push: {
@@ -32,7 +33,8 @@ export default {
   // Find all devices
   findAll: async (req, res) => {
     Producer.findOne({
-      'events._id': req.params.eventId
+      'events._id': req.params.eventId,
+      'userId': req.userId
     }, 'events.$')
       .then(producer => {
         if(!producer) {
@@ -51,7 +53,8 @@ export default {
   // Find one device
   findOne: async (req, res) => {
     Producer.findOne({
-      'events.devices._id': req.params.deviceId
+      'events.devices._id': req.params.deviceId,
+      'userId': req.userId
     }, 'events.$')
       .then(producer => {
         if(!producer && !producer.events[0]) {
@@ -83,7 +86,8 @@ export default {
       },
       {
         arrayFilters: [{ 
-          'device._id': req.params.deviceId
+          'device._id': req.params.deviceId,
+          'userId': req.userId
         }]
       }, (err) => {
         if (err) 
@@ -94,8 +98,9 @@ export default {
 
   // Delete device
   delete: async (req, res) => {
-    Producer.updateOne({ 
-      'events.devices._id': req.params.deviceId
+    Producer.updateOne({
+      'events.devices._id': req.params.deviceId,
+      'userId': req.userId
     }, { 
       $pull: { 
         'events.$.devices': { '_id': req.params.deviceId } 

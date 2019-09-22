@@ -20,7 +20,8 @@ export default {
       birthdate: req.body.birthdate,
       email: req.body.email,
       phone: req.body.phone,
-      password: hash
+      password: hash,
+      roles: ['USER']
     })
 
     user.save()
