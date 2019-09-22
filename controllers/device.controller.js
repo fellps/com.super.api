@@ -77,7 +77,9 @@ export default {
     }
 
     Producer.updateMany(
-      {},
+      {
+        'userId': req.userId
+      },
       { 
         $set: {
           'events.$[].devices.$[device].name': req.body.name,
@@ -86,8 +88,7 @@ export default {
       },
       {
         arrayFilters: [{ 
-          'device._id': req.params.deviceId,
-          'userId': req.userId
+          'device._id': req.params.deviceId
         }]
       }, (err) => {
         if (err) 

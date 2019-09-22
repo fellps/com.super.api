@@ -77,7 +77,9 @@ export default {
     }
 
     Producer.updateMany(
-      {}, 
+      {
+        'userId': req.userId
+      }, 
       { 
         $set: {
           'events.$[].menus.$[menu].name': req.body.name,
@@ -86,8 +88,7 @@ export default {
       },
       {
         arrayFilters: [{ 
-          'menu._id': req.params.menuId,
-          'userId': req.userId
+          'menu._id': req.params.menuId
         }]
       }, (err) => {
         if (err) 

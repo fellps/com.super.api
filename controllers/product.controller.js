@@ -72,7 +72,9 @@ export default {
     }
 
     Producer.updateMany(
-      {}, 
+      {
+        'userId': req.userId
+      }, 
       { 
         $set: {
           'events.$[].products.$[product].name': req.body.name,
@@ -82,12 +84,11 @@ export default {
       },
       {
         arrayFilters: [{ 
-          'product._id': req.params.productId,
-          'userId': req.userId
+          'product._id': req.params.productId
         }]
       }, (err) => {
         if (err) 
-          return Result.Error.ErrorOnUpdate(res)
+          return Result.Error.ErrorOnUpdate(res, err.message)
         return Result.Success.SuccessOnUpdate(res)
       })
   },
