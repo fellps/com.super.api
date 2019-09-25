@@ -1,5 +1,6 @@
 import Producer from '../models/producer.model'
 import Result from '../modules/result'
+import Filter from '../modules/filterCreator'
 import _ from 'lodash'
 
 export default {
@@ -10,7 +11,7 @@ export default {
     }
 
     Producer.findOne({
-      _id: req.params.producerId,
+      //_id: req.params.producerId,
       userId: req.userId
     })
       .then(producer => {
@@ -25,7 +26,9 @@ export default {
           state: req.body.state,
           city: req.body.city,
           address: req.body.address,
-          addressNumber: req.body.addressNumber
+          addressNumber: req.body.addressNumber,
+          description: req.body.description,
+          isEnabled: true
         })
         producer.save()
         return Result.Success.SuccessOnSave(res, producer)
@@ -39,29 +42,26 @@ export default {
 
   // Find all events
   findAll: async (req, res) => {
-    Producer.findOne({
-      _id: req.params.producerId,
+    Producer.findOne(Filter(req, {
+      //_id: req.params.producerId,
       userId: req.userId
-    })
+    }))
       .then(producer => {
-        if(!producer) {
-          return Result.NotFound.NoRecordsFound(res)
-        }
-        return Result.Success.SuccessOnSearch(res, producer.events)
+        return Result.Success.SuccessOnSearch(res, (producer && producer.events) || [])
       }).catch(err => {
         if(err.kind === 'ObjectId') {
           return Result.NotFound.NoRecordsFound(res)
         }
-        return Result.Error.ErrorOnSearch(res)
+        return Result.Error.ErrorOnSearch(res, err.message)
       })
   },
 
   // Find one event
   findOne: async (req, res) => {
-    Producer.findOne({
+    Producer.findOne(Filter(req, {
       'events._id': req.params.eventId,
       'userId': req.userId
-    }, 'events.$')
+    }), 'events.$')
       .then(producer => {
         if(!producer) {
           return Result.NotFound.NoRecordsFound(res)
@@ -93,7 +93,9 @@ export default {
       'events.$.state': req.body.state,
       'events.$.city': req.body.city,
       'events.$.address': req.body.address,
-      'events.$.addressNumber': req.body.addressNumber
+      'events.$.addressNumber': req.body.addressNumber,
+      'events.$.description': req.body.description,
+      'events.$.isEnabled': req.body.isEnabled
     })
       .then(producer => {
         if(!producer) {
@@ -104,7 +106,7 @@ export default {
         if(err.kind === 'ObjectId') {
           return Result.NotFound.NoRecordsFound(res)
         }
-        return Result.Error.ErrorOnSearch(res)
+        return Result.Error.ErrorOnSearch(res, err.message)
       })
   },
 

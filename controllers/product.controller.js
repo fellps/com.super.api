@@ -1,5 +1,6 @@
 import Producer from '../models/producer.model'
 import Result from '../modules/result'
+import Filter from '../modules/filterCreator'
 import _ from 'lodash'
 
 export default {
@@ -27,10 +28,10 @@ export default {
 
   // Find all products
   findAll: async (req, res) => {
-    Producer.findOne({
+    Producer.findOne(Filter(req, {
       'events._id': req.params.eventId,
       'userId': req.userId
-    }, 'events.$')
+    }), 'events.$')
       .then(producer => {
         if(!producer) {
           return Result.NotFound.NoRecordsFound(res)
@@ -47,10 +48,10 @@ export default {
 
   // Find one product
   findOne: async (req, res) => {
-    Producer.findOne({
+    Producer.findOne(Filter(req, {
       'events.products._id': req.params.productId,
       'userId': req.userId
-    }, 'events.$')
+    }), 'events.$')
       .then(producer => {
         if(!producer && !producer.events[0]) {
           return Result.NotFound.NoRecordsFound(res)

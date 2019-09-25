@@ -12,9 +12,11 @@ export const EventSchema = mongoose.Schema({
   city: String,
   address: String,
   addressNumber: Number,
+  description: String,
   menus: [MenuSchema],
   products: [ProductSchema],
-  devices: [DeviceSchema]
+  devices: [DeviceSchema],
+  isEnabled: Boolean
 }, {
   timestamps: true
 })

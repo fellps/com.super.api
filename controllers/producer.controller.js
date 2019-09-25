@@ -1,5 +1,6 @@
 import Producer from '../models/producer.model'
 import Result from '../modules/result'
+import Filter from '../modules/filterCreator'
 import _ from 'lodash'
 
 export default {
@@ -19,7 +20,8 @@ export default {
       addressNumber: req.body.addressNumber,
       email: req.body.email,
       phone: req.body.phone,
-      userId: req.userId
+      userId: req.userId,
+      isEnabled: true
     })
 
     producer.save()
@@ -32,7 +34,7 @@ export default {
 
   // Find all producers
   findAll: async (req, res) => {
-    Producer.find()
+    Producer.find(Filter(req, {}))
       .then(producers => {
         return Result.Success.SuccessOnSearch(res, producers)
       }).catch(() => {
@@ -42,15 +44,15 @@ export default {
 
   // Find one producer
   findOne: async (req, res) => {
-    Producer.find({
+    Producer.find(Filter(req, {
       _id: req.params.producerId,
       userId: req.userId
-    })
+    }))
       .then(producer => {
         if(!producer) {
           return Result.NotFound.NoRecordsFound(res)           
         }
-        return Result.Success.SuccessOnSearch(res, producer)
+        return Result.Success.SuccessOnSearch(res, producer.shift())
       }).catch(err => {
         if(err.kind === 'ObjectId') {
           return Result.NotFound.NoRecordsFound(res)

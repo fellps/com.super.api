@@ -1,6 +1,7 @@
 import User from '../models/user.model'
 import Result from '../modules/result'
 import Crypto from 'crypto'
+import Filter from '../modules/filterCreator'
 import _ from 'lodash'
 
 export default {
@@ -34,7 +35,7 @@ export default {
 
   // Find all users
   findAll: async (req, res) => {
-    User.find()
+    User.find(Filter(req, {}))
       .then(users => {
         return Result.Success.SuccessOnSearch(res, users)
       }).catch(() => {
@@ -44,7 +45,9 @@ export default {
 
   // Find one user
   findOne: async (req, res) => {
-    User.findById(req.params.userId)
+    User.findOne(Filter(req, {
+      _id: req.params.userId
+    }))
       .then(user => {
         if(!user) {
           return Result.NotFound.NoRecordsFound(res)           

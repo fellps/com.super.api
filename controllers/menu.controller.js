@@ -1,5 +1,6 @@
 import Producer from '../models/producer.model'
 import Result from '../modules/result'
+import Filter from '../modules/filterCreator'
 import _ from 'lodash'
 
 export default {
@@ -32,10 +33,10 @@ export default {
 
   // Find all menus
   findAll: async (req, res) => {
-    Producer.findOne({
+    Producer.findOne(Filter(req, {
       'events._id': req.params.eventId,
       'userId': req.userId
-    }, 'events.$')
+    }), 'events.$')
       .then(producer => {
         if(!producer) {
           return Result.NotFound.NoRecordsFound(res)
@@ -52,10 +53,10 @@ export default {
 
   // Find one menu
   findOne: async (req, res) => {
-    Producer.findOne({
+    Producer.findOne(Filter(req, {
       'events.menus._id': req.params.menuId,
       'userId': req.userId
-    }, 'events.$')
+    }), 'events.$')
       .then(producer => {
         if(!producer && !producer.events[0]) {
           return Result.NotFound.NoRecordsFound(res)
@@ -83,7 +84,7 @@ export default {
       { 
         $set: {
           'events.$[].menus.$[menu].name': req.body.name,
-          'events.$[].menus.$[menu].products': JSON.parse(req.body.products) 
+          'events.$[].menus.$[menu].productsIds': JSON.parse(req.body.productsIds) 
         }
       },
       {

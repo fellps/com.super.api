@@ -32,7 +32,7 @@ mongoose.connect(process.env.DB_HOST, {
 })
 
 app.use('/', routes)
-// listen on port 3000
+// listen on port 3001
 app.listen(process.env.API_PORT, () => {
   console.log(`Server is listening on port ${process.env.API_PORT}!`)
 })
