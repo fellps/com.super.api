@@ -1,0 +1,11 @@
+Instale run-rs globalmente com npm's -gsinalizador. Você também pode listar run-rs nas devDependencies do seu projeto.
+
+> npm install run-rs -g
+
+Em seguida, execute run-rs com o sinalizador --version. O Run-rs fará o download do MongoDB v4.0.0 para você. Não se preocupe, ele não substituirá a instalação existente do MongoDB.
+
+> run-rs -v 4.0.0 --shell
+
+Em seguida, use replicaSet=rs na sua seqüência de conexão.
+
+Mais detalhes: http://thecodebarbarian.com/introducing-run-rs-zero-config-mongodb-runner

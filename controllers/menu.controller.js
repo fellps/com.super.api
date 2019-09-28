@@ -2,6 +2,7 @@ import Producer from '../models/producer.model'
 import Result from '../modules/result'
 import Filter from '../modules/filterCreator'
 import _ from 'lodash'
+import uuid from 'uuid'
 
 export default {
   // Create menu
@@ -10,25 +11,53 @@ export default {
       return Result.Error.RequiredBody(res)
     }
 
-    const menu = {
-      name: req.body.name,
-      productsIds: JSON.parse(req.body.productsIds)
-    }
+    const session = await Producer.startSession()
+    session.startTransaction()
 
-    Producer.updateOne({ 
-      'events._id': req.params.eventId,
-      'userId': req.userId
-    },
-    {
-      $push: {
-        'events.$.menus': menu
+    try {     
+      const menu = {
+        _id: uuid(),
+        name: req.body.name,
+        isEnabled: true,
+        productsIds: Object.keys(req.body.products)
       }
-    },
-    (err) => {
-      if (err) 
-        return Result.Error.ErrorOnSave(res)
+  
+      var products = Object.keys(req.body.products).map((key) => {
+        let arr = []
+        req.body.products[key]['_id'] = key
+        return arr[key] = req.body.products[key]
+      })
+
+      await Producer.findOneAndUpdate({
+        'events._id': req.params.eventId,
+        'userId': req.userId
+      },
+      {
+        $push: {
+          'events.$.products': products
+        }
+      })
+
+      await Producer.findOneAndUpdate({
+        'events._id': req.params.eventId,
+        'userId': req.userId
+      },
+      {
+        $push: {
+          'events.$.menus': menu
+        }
+      })
+  
+      await session.commitTransaction()
+      session.endSession()
+
       return Result.Success.SuccessOnSave(res)
-    })
+    } catch (err) {
+      await session.abortTransaction()
+      session.endSession()
+
+      return Result.Error.ErrorOnSave(res)
+    }
   },
 
   // Find all menus
@@ -42,7 +71,16 @@ export default {
           return Result.NotFound.NoRecordsFound(res)
         }
         const event = producer.events.id(req.params.eventId)
-        return Result.Success.SuccessOnSearch(res, event.menus)
+        const menus = event.menus.map((menu) => {
+          return { 
+            _id: menu._id, 
+            name: menu.name,
+            isEnabled: menu.isEnabled,
+            productsIds: menu.productsIds,
+            totalProducts: menu.productsIds.length
+          }
+        }, [])
+        return Result.Success.SuccessOnSearch(res, menus)
       }).catch(err => {
         if(err.kind === 'ObjectId') {
           return Result.NotFound.NoRecordsFound(res)
@@ -62,7 +100,38 @@ export default {
           return Result.NotFound.NoRecordsFound(res)
         }
         const menu = producer.events[0].menus.id(req.params.menuId)
-        return Result.Success.SuccessOnSearch(res, menu)
+
+        Producer.aggregate([
+          { $match: { 'userId': req.userId } }, 
+          { $unwind: '$events' }, 
+          { $unwind: '$events.products' }, 
+          { 
+            $match: { 
+              'events.products._id': { $in: menu.productsIds } 
+            } 
+          },
+          { $group: { _id: '$events.products' } }
+        ])
+          .then(products => {
+            products = products.map((key) => {
+              return key._id
+            }, [])
+
+            return Result.Success.SuccessOnSearch(res, {
+              _id: menu._id, 
+              name: menu.name,
+              isEnabled: menu.isEnabled,
+              products: products,
+              productsIds: menu.productsIds,
+              totalProducts: menu.productsIds.length
+            })
+          })
+          .catch(err => {
+            if(err.kind === 'ObjectId') {
+              return Result.NotFound.NoRecordsFound(res)
+            }
+            return Result.Error.ErrorOnSearch(res)
+          })
       }).catch(err => {
         if(err.kind === 'ObjectId') {
           return Result.NotFound.NoRecordsFound(res)
@@ -84,6 +153,7 @@ export default {
       { 
         $set: {
           'events.$[].menus.$[menu].name': req.body.name,
+          'events.$[].menus.$[menu].isEnabled': req.body.isEnabled,
           'events.$[].menus.$[menu].productsIds': JSON.parse(req.body.productsIds) 
         }
       },

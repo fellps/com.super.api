@@ -11,7 +11,7 @@ export default {
     }
 
     Producer.findOne({
-      //_id: req.params.producerId,
+      _id: req.params.producerId,
       userId: req.userId
     })
       .then(producer => {
@@ -42,12 +42,15 @@ export default {
 
   // Find all events
   findAll: async (req, res) => {
-    Producer.findOne(Filter(req, {
-      //_id: req.params.producerId,
+    Producer.find(Filter(req, {
       userId: req.userId
     }))
       .then(producer => {
-        return Result.Success.SuccessOnSearch(res, (producer && producer.events) || [])
+        const events = producer.reduce((events, producer) => {
+          events.push(producer.events.shift())
+          return events
+        }, [])
+        return Result.Success.SuccessOnSearch(res, events)
       }).catch(err => {
         if(err.kind === 'ObjectId') {
           return Result.NotFound.NoRecordsFound(res)
@@ -66,7 +69,8 @@ export default {
         if(!producer) {
           return Result.NotFound.NoRecordsFound(res)
         }
-        const event = producer.events.id(req.params.eventId)
+        let event = producer.events.id(req.params.eventId)
+        event.producerId = producer._id
         return Result.Success.SuccessOnSearch(res, event)
       }).catch(err => {
         if(err.kind === 'ObjectId') {
