@@ -20,7 +20,7 @@ app.use((req, res, next) => {
 mongoose.Promise = global.Promise
 
 // Connecting to the database
-mongoose.connect(process.env.DB_HOST, {
+mongoose.connect(process.env.DB_HOST_DEV, {
   useUnifiedTopology: true,
   useNewUrlParser: true,
   useCreateIndex: true

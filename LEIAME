@@ -1,6 +1,10 @@
-Instale run-rs globalmente com npm's -gsinalizador. Você também pode listar run-rs nas devDependencies do seu projeto.
+Instale run-rs globalmente com npm's -g sinalizador. Você também pode listar run-rs nas devDependencies do seu projeto.
 
 > npm install run-rs -g
+
+run-rs limpa o banco de dados toda vez que é iniciado por padrão. Para substituir esse comportamento, use o sinalizador --keep( -k).
+
+> run-rs --keep
 
 Em seguida, execute run-rs com o sinalizador --version. O Run-rs fará o download do MongoDB v4.0.0 para você. Não se preocupe, ele não substituirá a instalação existente do MongoDB.
 

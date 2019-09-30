@@ -80,8 +80,7 @@ export default {
       address: req.body.address,
       addressNumber: req.body.addressNumber,
       email: req.body.email,
-      phone: req.body.phone,
-      userId: req.userId
+      phone: req.body.phone
     }, { new: true })
       .then(producer => {
         if(!producer) {

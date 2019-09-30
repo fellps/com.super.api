@@ -99,7 +99,7 @@ export default {
       'events.$.address': req.body.address,
       'events.$.addressNumber': req.body.addressNumber,
       'events.$.description': req.body.description,
-      'events.$.isEnabled': req.body.isEnabled
+      'events.$.isEnabled': req.body.isEnabled == 'true'
     })
       .then(producer => {
         if(!producer) {

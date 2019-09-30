@@ -11,23 +11,23 @@ export default {
       return Result.Error.RequiredBody(res)
     }
 
+    const menu = {
+      _id: uuid(),
+      name: req.body.name,
+      isEnabled: true,
+      productsIds: Object.keys(req.body.products)
+    }
+
+    var products = Object.keys(req.body.products).map((key) => {
+      let arr = []
+      req.body.products[key]['_id'] = key
+      return arr[key] = req.body.products[key]
+    })
+
     const session = await Producer.startSession()
     session.startTransaction()
 
-    try {     
-      const menu = {
-        _id: uuid(),
-        name: req.body.name,
-        isEnabled: true,
-        productsIds: Object.keys(req.body.products)
-      }
-  
-      var products = Object.keys(req.body.products).map((key) => {
-        let arr = []
-        req.body.products[key]['_id'] = key
-        return arr[key] = req.body.products[key]
-      })
-
+    try {
       await Producer.findOneAndUpdate({
         'events._id': req.params.eventId,
         'userId': req.userId
@@ -146,26 +146,82 @@ export default {
       return Result.Error.RequiredBody(res)
     }
 
-    Producer.updateMany(
-      {
-        'userId': req.userId
-      }, 
-      { 
-        $set: {
-          'events.$[].menus.$[menu].name': req.body.name,
-          'events.$[].menus.$[menu].isEnabled': req.body.isEnabled,
-          'events.$[].menus.$[menu].productsIds': JSON.parse(req.body.productsIds) 
+    var productsIds = Object.keys(req.body.products).map((key) => {
+      const id = req.body.products[key]['_id']
+      return id !== undefined ? id : key
+    })
+
+    const session = await Producer.startSession()
+    session.startTransaction()
+
+    try {
+      await Producer.updateMany(
+        {
+          'userId': req.userId
+        }, 
+        { 
+          $set: {
+            'events.$[].menus.$[menu].name': req.body.name,
+            'events.$[].menus.$[menu].isEnabled': req.body.isEnabled == 'true',
+            'events.$[].menus.$[menu].productsIds': productsIds
+          }
+        },
+        {
+          arrayFilters: [{ 
+            'menu._id': req.params.menuId
+          }]
+        })
+
+      Object.keys(req.body.products).forEach(async (key) => {
+        const id = req.body.products[key]['_id']
+        let color = req.body.products[key]['color']
+        color = !_.isEmpty(color) ? color : '#000000'
+        
+        if (id !== undefined) {
+          await Producer.updateMany(
+            {
+              'userId': req.userId
+            }, 
+            { 
+              $set: {
+                'events.$[].products.$[product].name': req.body.products[key]['name'],
+                'events.$[].products.$[product].value': req.body.products[key]['value'],
+                'events.$[].products.$[product].color': color
+              }
+            },
+            {
+              arrayFilters: [{ 
+                'product._id': id !== undefined ? id : key
+              }]
+            })
+        } else {
+          await Producer.updateOne({
+            'events.menus._id': req.params.menuId,
+            'userId': req.userId
+          },
+          {
+            $push: {
+              'events.$.products': {
+                '_id': key,
+                'name': req.body.products[key]['name'],
+                'value': req.body.products[key]['value'],
+                'color': color
+              }
+            }
+          })
         }
-      },
-      {
-        arrayFilters: [{ 
-          'menu._id': req.params.menuId
-        }]
-      }, (err) => {
-        if (err) 
-          return Result.Error.ErrorOnUpdate(res)
-        return Result.Success.SuccessOnUpdate(res)
       })
+  
+      await session.commitTransaction()
+      session.endSession()
+  
+      return Result.Success.SuccessOnSave(res)
+    } catch (err) {
+      await session.abortTransaction()
+      session.endSession()
+
+      return Result.Error.ErrorOnSave(res)
+    }
   },
 
   // Delete menu
