@@ -11,7 +11,8 @@ export default {
 
     const device = {
       name: req.body.name,
-      menusIds: JSON.parse(req.body.menusIds)
+      menusIds: req.body.menusIds,
+      isEnabled: true
     }
 
     Producer.updateOne({ 
@@ -83,7 +84,8 @@ export default {
       { 
         $set: {
           'events.$[].devices.$[device].name': req.body.name,
-          'events.$[].devices.$[device].menusIds': JSON.parse(req.body.menusIds)
+          'events.$[].devices.$[device].menusIds': req.body.menusIds,
+          'events.$[].devices.$[device].isEnabled': req.body.isEnabled
         }
       },
       {

@@ -22,7 +22,8 @@ export default {
       email: req.body.email,
       phone: req.body.phone,
       password: hash,
-      roles: ['USER']
+      roles: ['USER'],
+      isEnabled: true
     })
 
     user.save()
@@ -67,17 +68,13 @@ export default {
       return Result.Error.RequiredBody(res)
     }
 
-    const hash = Crypto.createHmac('sha256', process.env.PASSWORD_SECRET)
-      .update(req.body.password)
-      .digest('hex')
-
     User.findByIdAndUpdate(req.params.userId, {
       name: req.body.name,
       cpf: req.body.cpf,
       birthdate: req.body.birthdate,
       email: req.body.email,
       phone: req.body.phone,
-      password: hash
+      isEnabled: req.body.isEnabled
     }, { new: true })
       .then(user => {
         if(!user) {

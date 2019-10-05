@@ -72,7 +72,7 @@ export default {
         }
         const event = producer.events.id(req.params.eventId)
         const menus = event.menus.map((menu) => {
-          return { 
+          return {
             _id: menu._id, 
             name: menu.name,
             isEnabled: menu.isEnabled,
@@ -102,7 +102,7 @@ export default {
         const menu = producer.events[0].menus.id(req.params.menuId)
 
         Producer.aggregate([
-          { $match: { 'userId': req.userId } }, 
+          { $match: { 'userId': req.userId } },
           { $unwind: '$events' }, 
           { $unwind: '$events.products' }, 
           { 

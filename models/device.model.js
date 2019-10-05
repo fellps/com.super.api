@@ -2,7 +2,8 @@ import mongoose from 'mongoose'
 
 export const DeviceSchema = mongoose.Schema({
   name: String,
-  menusIds: []
+  menusIds: [],
+  isEnabled: Boolean
 }, {
   timestamps: true
 })

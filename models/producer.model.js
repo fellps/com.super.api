@@ -12,8 +12,11 @@ export const ProducerSchema = mongoose.Schema({
   email: String,
   phone: Number,
   events: [EventSchema],
-  userId: String,
-  isEnabled: Boolean
+  isEnabled: Boolean,
+  userId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User'
+  }
 }, {
   timestamps: true
 })

@@ -6,8 +6,10 @@ import Product from './product.route'
 import Device from './device.route'
 import User from './user.route'
 import Auth from './auth.route'
+import POS from './pos.route'
 import Result from '../modules/result'
 import VerifyJWT from '../modules/jwt'
+import Decode from '../modules/decode'
 
 const app = express()
 
@@ -22,5 +24,6 @@ app
   .use('/devices', VerifyJWT, Device)
   .use('/users', User)
   .use('/auth', Auth)
+  .use('/pos', Decode, POS)
 
 export default app

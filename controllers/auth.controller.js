@@ -15,7 +15,7 @@ export default {
       .update(req.body.password)
       .digest('hex')
 
-    User.find({
+    User.findOne({
       cpf: req.body.cpf,
       password: hash
     })
@@ -23,9 +23,11 @@ export default {
         if(_.isEmpty(user)) {
           return Result.NotFound.ErrorOnLogin(res)           
         }
-        const id = user.shift().id
+        const { id } = user
         const result = {
+          _id: id,
           auth: true,
+          name: user.name,
           token: Jwt.sign({ id }, process.env.JWT_SECRET, {
             expiresIn: 60 * 60 * 12 // expires in 12h
           })

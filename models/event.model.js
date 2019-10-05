@@ -16,8 +16,8 @@ export const EventSchema = mongoose.Schema({
   menus: [MenuSchema],
   products: [ProductSchema],
   devices: [DeviceSchema],
-  isEnabled: Boolean,
-  producerId: String
+  producerId: String,
+  isEnabled: Boolean
 }, {
   timestamps: true
 })

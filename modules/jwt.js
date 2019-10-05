@@ -1,6 +1,7 @@
 import Jwt from 'jsonwebtoken'
 import Result from './result'
 import User from '../models/user.model'
+import mongoose from 'mongoose'
 import _ from 'lodash'
 
 const verifyJWT = (req, res, next) => {
@@ -14,7 +15,7 @@ const verifyJWT = (req, res, next) => {
 
     // se tudo estiver ok, salva no request para uso posterior
 
-    req.userId = decoded.id
+    req.userId = mongoose.Types.ObjectId(decoded.id)
     next()
   })
 }
@@ -41,7 +42,7 @@ export const verifyAdminJWT = (req, res, next) => {
         if (!isAdmin)
           return Result.Unauthorized.ErrorPermission(res)
 
-        req.userId = decoded.id
+        req.userId = mongoose.Types.ObjectId(decoded.id)
         next()
       }).catch(() => {
         return Result.Unauthorized.RequiredLogin(res)
