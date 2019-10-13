@@ -4,6 +4,7 @@ export const ProductSchema = mongoose.Schema({
   _id : { type : String, required : true },
   name: String,
   value: Number, 
+  count: Number,
   color: String
 }, {
   timestamps: true
