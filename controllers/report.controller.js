@@ -19,7 +19,8 @@ export default {
         {
           $group: {
             _id: {$toLower: '$paymentMethod'},
-            count: { $sum: 1 }
+            count: { $sum: 1 },
+            totalAmount: { $sum: '$amount' }
           }
         }
       ])
@@ -71,6 +72,7 @@ export default {
           id: pm._id,
           paymentMethod: paymentMethod,
           count: pm.count,
+          totalAmount: pm.totalAmount,
           percent: parseInt((pm.count / event.totalTransactions) * 100)
         }
       })
