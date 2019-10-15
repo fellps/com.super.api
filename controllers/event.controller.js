@@ -43,7 +43,8 @@ export default {
   // Find all events
   findAll: async (req, res) => {
     Producer.find(Filter(req, {
-      userId: req.userId
+      userId: req.userId,
+      events: {$exists: true, $not: {$size: 0}}
     }))
       .then(producer => {
         const events = producer.reduce((events, producer) => {

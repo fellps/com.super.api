@@ -42,7 +42,16 @@ export default {
           return Result.NotFound.NoRecordsFound(res)
         }
         const event = producer.events.id(req.params.eventId)
-        return Result.Success.SuccessOnSearch(res, event.devices)
+        const devices = event.devices.map((device) => {
+          return {
+            _id: device._id, 
+            name: device.name,
+            isEnabled: device.isEnabled,
+            menusIds: device.menusIds,
+            totalMenus: device.menusIds.length
+          }
+        }, [])
+        return Result.Success.SuccessOnSearch(res, devices)
       }).catch(err => {
         if(err.kind === 'ObjectId') {
           return Result.NotFound.NoRecordsFound(res)

@@ -12,7 +12,9 @@ export default {
         { $group: { _id: null, totalEventAmount: { $sum: '$amount' }, totalTransactions: { $sum: 1 } } },
       ]).exec()
 
-      const totalPOSData = await Transaction.distinct('deviceId').exec()
+      const totalPOSData = await Transaction.distinct('deviceId', { 
+        eventId: mongoose.Types.ObjectId(req.params.eventId)
+      }).exec()
 
       const paymentMethodData = await Transaction.aggregate([
         { $match: { eventId: mongoose.Types.ObjectId(req.params.eventId) } },
