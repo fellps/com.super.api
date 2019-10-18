@@ -65,6 +65,8 @@ export default {
         cardBin: req.body.CardBin,
         cardHolder: req.body.CardHolder,
         cardBrandCode: req.body.CardBrandCode,
+        isDelivered: false,
+        deliveryUser: '',
         createdAt: Date.parse(req.body.CreatedAt)
       })
   
@@ -83,6 +85,45 @@ export default {
         return Result.Success.SuccessOnSave(res)
       }
 
+      return Result.Error.ErrorOnSave(res)
+    }
+  },
+
+  saveTransactionDelivery: async (req, res) => {
+    if(_.isEmpty(req.body)) {
+      return Result.Error.RequiredBody(res)
+    }
+
+    console.log(req.body)
+    const session = await Transaction.startSession()
+    session.startTransaction()
+
+    try {
+      Transaction.findOneAndUpdate({
+        _id: req.body.code
+      }, {
+        isDelivered: true,
+        deliveryUser: req.body.cpf
+      }, { new: true })
+        .then(transaction => {
+          if(!transaction) {
+            return Result.NotFound.NoRecordsFound(res)
+          }
+          return Result.Success.SuccessOnUpdate(res)
+        }).catch(err => {
+          if(err.kind === 'ObjectId') {
+            return Result.NotFound.NoRecordsFound(res)           
+          }
+          return Result.InternalError.ErrorOnOperation(res)
+        })
+
+      await session.commitTransaction()
+      session.endSession()
+
+      return Result.Success.SuccessOnSave(res)
+    } catch (err) {
+      await session.abortTransaction()
+      session.endSession()
       return Result.Error.ErrorOnSave(res)
     }
   }
