@@ -28,6 +28,7 @@ export default {
           address: req.body.address,
           addressNumber: req.body.addressNumber,
           description: req.body.description,
+          managerPassword: req.body.managerPassword,
           isEnabled: true
         })
         producer.save()
@@ -100,6 +101,7 @@ export default {
       'events.$.address': req.body.address,
       'events.$.addressNumber': req.body.addressNumber,
       'events.$.description': req.body.description,
+      'events.$.managerPassword': req.body.managerPassword,
       'events.$.isEnabled': req.body.isEnabled == 'true'
     })
       .then(producer => {

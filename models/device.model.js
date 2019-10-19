@@ -3,6 +3,8 @@ import mongoose from 'mongoose'
 export const DeviceSchema = mongoose.Schema({
   name: String,
   menusIds: [],
+  acquirer: String,
+  isQRCodeEnabled: Boolean,
   isEnabled: Boolean
 }, {
   timestamps: true

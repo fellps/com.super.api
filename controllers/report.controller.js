@@ -75,7 +75,7 @@ export default {
           paymentMethod: paymentMethod,
           count: pm.count,
           totalAmount: pm.totalAmount,
-          percent: parseInt((pm.count / event.totalTransactions) * 100)
+          percent: parseFloat((pm.count / event.totalTransactions) * 100).toFixed(1)
         }
       })
 

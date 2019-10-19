@@ -12,6 +12,8 @@ export default {
     const device = {
       name: req.body.name,
       menusIds: req.body.menusIds,
+      acquirer: req.body.acquirer,
+      isQRCodeEnabled: req.body.isQRCodeEnabled,
       isEnabled: true
     }
 
@@ -47,6 +49,8 @@ export default {
             _id: device._id, 
             name: device.name,
             isEnabled: device.isEnabled,
+            acquirer: device.acquirer,
+            isQRCodeEnabled: device.isQRCodeEnabled,
             menusIds: device.menusIds,
             totalMenus: device.menusIds.length
           }
@@ -94,7 +98,9 @@ export default {
         $set: {
           'events.$[].devices.$[device].name': req.body.name,
           'events.$[].devices.$[device].menusIds': req.body.menusIds,
-          'events.$[].devices.$[device].isEnabled': req.body.isEnabled
+          'events.$[].devices.$[device].acquirer': req.body.acquirer,
+          'events.$[].devices.$[device].isEnabled': req.body.isEnabled,
+          'events.$[].devices.$[device].isQRCodeEnabled': req.body.isQRCodeEnabled
         }
       },
       {
