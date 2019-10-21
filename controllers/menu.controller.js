@@ -1,6 +1,7 @@
 import Producer from '../models/producer.model'
 import Result from '../modules/result'
 import Filter from '../modules/filterCreator'
+import mongoose from 'mongoose'
 import _ from 'lodash'
 import uuid from 'uuid'
 
@@ -62,30 +63,49 @@ export default {
 
   // Find all menus
   findAll: async (req, res) => {
-    Producer.findOne(Filter(req, {
-      'events._id': req.params.eventId,
-      'userId': req.userId
-    }), 'events.$')
-      .then(producer => {
-        if(!producer) {
+    Producer.aggregate([
+      { 
+        $match: { 
+          'events._id': mongoose.Types.ObjectId(req.params.eventId),
+          'userId': req.userId
+        },
+      },
+      { $unwind: '$events' }, 
+      { $unwind: '$events.menus' },
+      { 
+        $match: {
+          'events.menus.name': {$regex: req.query.name || '', $options: 'i'}
+        } 
+      },
+      { 
+        $group: {
+          _id: null,
+          menus: {
+            $push: {
+              _id: '$events.menus._id',
+              name: '$events.menus.name',
+              isEnabled: '$events.menus.isEnabled',
+              productsIds: '$events.menus.productsIds',
+            }
+          } 
+        } 
+      }
+    ])
+      .then(menus => {
+        if(!menus || menus[0] === undefined) {
           return Result.NotFound.NoRecordsFound(res)
         }
-        const event = producer.events.id(req.params.eventId)
-        const menus = event.menus.map((menu) => {
-          return {
-            _id: menu._id, 
-            name: menu.name,
-            isEnabled: menu.isEnabled,
-            productsIds: menu.productsIds,
-            totalProducts: menu.productsIds.length
-          }
+        
+        menus = menus[0].menus.map((menu) => {
+          return { ...menu, totalProducts: menu.productsIds.length }
         }, [])
+
         return Result.Success.SuccessOnSearch(res, menus)
       }).catch(err => {
         if(err.kind === 'ObjectId') {
           return Result.NotFound.NoRecordsFound(res)
         }
-        return Result.Error.ErrorOnSearch(res)
+        return Result.Error.ErrorOnSearch(res, err.message)
       })
   },
 
@@ -163,7 +183,8 @@ export default {
           $set: {
             'events.$[].menus.$[menu].name': req.body.name,
             'events.$[].menus.$[menu].isEnabled': req.body.isEnabled == 'true',
-            'events.$[].menus.$[menu].productsIds': productsIds
+            'events.$[].menus.$[menu].productsIds': productsIds,
+            'events.$[].menus.$[menu].updatedAt': new Date()
           }
         },
         {

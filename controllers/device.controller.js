@@ -1,5 +1,6 @@
 import Producer from '../models/producer.model'
 import Result from '../modules/result'
+import mongoose from 'mongoose'
 import _ from 'lodash'
 
 export default {
@@ -35,26 +36,46 @@ export default {
 
   // Find all devices
   findAll: async (req, res) => {
-    Producer.findOne({
-      'events._id': req.params.eventId,
-      'userId': req.userId
-    }, 'events.$')
-      .then(producer => {
-        if(!producer) {
+    Producer.aggregate([
+      { 
+        $match: { 
+          'events._id': mongoose.Types.ObjectId(req.params.eventId),
+          'userId': req.userId
+        },
+      },
+      { $unwind: '$events' }, 
+      { $unwind: '$events.devices' },
+      { 
+        $match: {
+          'events.devices.name': {$regex: req.query.name || '', $options: 'i'}
+        } 
+      },
+      { 
+        $group: {
+          _id: null,
+          devices: {
+            $push: {
+              _id: '$events.devices._id',
+              name: '$events.devices.name',
+              isEnabled: '$events.devices.isEnabled',
+              productsIds: '$events.devices.productsIds',
+              acquirer: '$events.devices.acquirer',
+              isQRCodeEnabled: '$events.devices.isQRCodeEnabled',
+              menusIds: '$events.devices.menusIds'
+            }
+          } 
+        } 
+      }
+    ])
+      .then(devices => {
+        if(!devices || devices[0] === undefined) {
           return Result.NotFound.NoRecordsFound(res)
         }
-        const event = producer.events.id(req.params.eventId)
-        const devices = event.devices.map((device) => {
-          return {
-            _id: device._id, 
-            name: device.name,
-            isEnabled: device.isEnabled,
-            acquirer: device.acquirer,
-            isQRCodeEnabled: device.isQRCodeEnabled,
-            menusIds: device.menusIds,
-            totalMenus: device.menusIds.length
-          }
+        
+        devices = devices[0].devices.map((device) => {
+          return { ...device, totalMenus: device.menusIds.length }
         }, [])
+
         return Result.Success.SuccessOnSearch(res, devices)
       }).catch(err => {
         if(err.kind === 'ObjectId') {
@@ -100,7 +121,8 @@ export default {
           'events.$[].devices.$[device].menusIds': req.body.menusIds,
           'events.$[].devices.$[device].acquirer': req.body.acquirer,
           'events.$[].devices.$[device].isEnabled': req.body.isEnabled,
-          'events.$[].devices.$[device].isQRCodeEnabled': req.body.isQRCodeEnabled
+          'events.$[].devices.$[device].isQRCodeEnabled': req.body.isQRCodeEnabled,
+          'events.$[].devices.$[device].updatedAt': new Date()
         }
       },
       {

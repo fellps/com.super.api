@@ -35,11 +35,10 @@ export default {
   // Find all producers
   findAll: async (req, res) => {
     Producer.find(Filter(req, {}))
-      //.select('socialReason cnpj')
       .then(producers => {
-        return Result.Success.SuccessOnSearch(res, producers)
+        return Result.Success.SuccessOnSearch(res, producers || [])
       }).catch(() => {
-        return Result.Success.NoRecordsFound(res)
+        return Result.Success.NoRecordsFound(res, [])
       })
   },
 
