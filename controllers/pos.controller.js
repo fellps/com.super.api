@@ -1,9 +1,12 @@
 import Result from '../modules/result'
 import Producer from '../models/producer.model'
+import User from '../models/user.model'
 import Transaction from '../models/transaction.model'
 
 import mongoose from 'mongoose'
 import _ from 'lodash'
+
+import sql from '../modules/sqlToMongo'
 
 function getObjectIdFromGuid(guid) {
   return guid.replace(/-/g, '').slice(0, 24)
@@ -12,6 +15,29 @@ function getObjectIdFromGuid(guid) {
 export default {
   // Configure POS
   config: async (req, res) => {
+
+    User.aggregate([{
+      '$match': {}
+    },{
+      '$group': {
+        '_id': '$name',
+        'count': {
+          '$sum': 1
+        }
+      }
+    },{
+      '$sort': {
+        'name': 1
+      }
+    }])
+      .then(result => {
+        console.log(result)
+      })
+
+    sql('SELECT name, COUNT(*) total FROM User GROUP BY name ORDER BY name', (result) => {
+      console.log(result)
+    })
+
     Producer.findOne({
       'events.devices._id': mongoose.Types.ObjectId(req.body.IdPOS)
     }, 'events.$')
@@ -60,7 +86,7 @@ export default {
         amount: req.body.Amount,
         paymentMethod: req.body.PaymentMethod,
         loggedUserDocument: req.body.LoggedUserDocument,
-        cardAquiredCode: req.body.CardAquiredCode,
+        cardTransactionCode: req.body.CardTransactionCode,
         cardAuthorizationCode: req.body.CardAuthorizationCode,
         cardBin: req.body.CardBin,
         cardHolder: req.body.CardHolder,

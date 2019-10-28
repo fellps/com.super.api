@@ -16,7 +16,7 @@ export const TransactionSchema = mongoose.Schema({
   amount: Number,
   paymentMethod: Number,
   loggedUserDocument: String,
-  cardAquiredCode: String,
+  cardTransactionCode: String,
   cardAuthorizationCode: String,
   cardBin: String,
   cardHolder: String,
