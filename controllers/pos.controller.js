@@ -61,6 +61,7 @@ export default {
         paymentMethod: req.body.PaymentMethod,
         loggedUserDocument: req.body.LoggedUserDocument,
         cardTransactionCode: req.body.CardTransactionCode,
+        cardTransactionId: req.body.CardTransactionId,
         cardAuthorizationCode: req.body.CardAuthorizationCode,
         cardBin: req.body.CardBin,
         cardHolder: req.body.CardHolder,
