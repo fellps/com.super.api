@@ -70,18 +70,17 @@ export default {
           cardBrandCode: req.body.CardBrandCode,
           isDelivered: false,
           deliveryUser: '',
-          createdAt: Date.parse(req.body.CreatedAt)
+          createdAt: Date.parse(req.body.CreatedAt),
+          canceledAt: null
         })
         await transaction.save()
       }
       else
       {
-        await Transaction.findOneAndUpdate({
+        await Transaction.updateOne({
           _id: req.body.IdTransaction,
         }, {
           canceledAt: Date.parse(req.body.CanceledAt)
-        }, { 
-          new: true 
         })
       }
 
