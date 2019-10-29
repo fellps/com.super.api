@@ -24,7 +24,8 @@ export const TransactionSchema = mongoose.Schema({
   cardBrandCode: String,
   isDelivered: Boolean,
   deliveryUser: String,
-  createdAt: Date
+  createdAt: Date,
+  canceledAt: Date
 }, {
   timestamps: true
 })

@@ -51,27 +51,39 @@ export default {
         }
       })
 
-      const transaction = new Transaction({
-        _id: req.body.IdTransaction,
-        eventId: mongoose.Types.ObjectId(getObjectIdFromGuid(req.body.IdEvent)),
-        deviceId: mongoose.Types.ObjectId(getObjectIdFromGuid(req.body.IdPOS)),
-        products: products,
-        terminalCode: req.body.TerminalCode,
-        amount: req.body.Amount,
-        paymentMethod: req.body.PaymentMethod,
-        loggedUserDocument: req.body.LoggedUserDocument,
-        cardTransactionCode: req.body.CardTransactionCode,
-        cardTransactionId: req.body.CardTransactionId,
-        cardAuthorizationCode: req.body.CardAuthorizationCode,
-        cardBin: req.body.CardBin,
-        cardHolder: req.body.CardHolder,
-        cardBrandCode: req.body.CardBrandCode,
-        isDelivered: false,
-        deliveryUser: '',
-        createdAt: Date.parse(req.body.CreatedAt)
-      })
-  
-      await transaction.save()
+      if (_.isEmpty(req.body.CanceledAt))
+      {
+        const transaction = new Transaction({
+          _id: req.body.IdTransaction,
+          eventId: mongoose.Types.ObjectId(getObjectIdFromGuid(req.body.IdEvent)),
+          deviceId: mongoose.Types.ObjectId(getObjectIdFromGuid(req.body.IdPOS)),
+          products: products,
+          terminalCode: req.body.TerminalCode,
+          amount: req.body.Amount,
+          paymentMethod: req.body.PaymentMethod,
+          loggedUserDocument: req.body.LoggedUserDocument,
+          cardTransactionCode: req.body.CardTransactionCode,
+          cardTransactionId: req.body.CardTransactionId,
+          cardAuthorizationCode: req.body.CardAuthorizationCode,
+          cardBin: req.body.CardBin,
+          cardHolder: req.body.CardHolder,
+          cardBrandCode: req.body.CardBrandCode,
+          isDelivered: false,
+          deliveryUser: '',
+          createdAt: Date.parse(req.body.CreatedAt)
+        })
+        await transaction.save()
+      }
+      else
+      {
+        await Transaction.findOneAndUpdate({
+          _id: req.body.IdTransaction,
+        }, {
+          canceledAt: Date.parse(req.body.CanceledAt)
+        }, { 
+          new: true 
+        })
+      }
 
       await session.commitTransaction()
       session.endSession()
@@ -81,6 +93,7 @@ export default {
       await session.abortTransaction()
       session.endSession()
 
+      //duplicate key error
       if (err.code == 11000)
       {
         return Result.Success.SuccessOnSave(res)
