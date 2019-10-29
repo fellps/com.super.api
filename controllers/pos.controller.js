@@ -51,7 +51,7 @@ export default {
         }
       })
 
-      if (_.isEmpty(req.body.CanceledAt))
+      if (_.isEmpty(req.body.CanceledAt) || req.body.CanceledAt == '0001-01-01T00:00:00')
       {
         const transaction = new Transaction({
           _id: req.body.IdTransaction,

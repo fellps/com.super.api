@@ -8,16 +8,16 @@ export default {
   salesSummary: async (req, res) => {
     try {
       const queryEvent = await Transaction.aggregate([
-        { $match: { eventId: mongoose.Types.ObjectId(req.params.eventId) } },
+        { $match: { eventId: mongoose.Types.ObjectId(req.params.eventId), canceledAt: null } },
         { $group: { _id: null, totalEventAmount: { $sum: '$amount' }, totalTransactions: { $sum: 1 } } },
       ])
 
       const queryPOS = await Transaction.distinct('deviceId', { 
-        eventId: mongoose.Types.ObjectId(req.params.eventId)
+        eventId: mongoose.Types.ObjectId(req.params.eventId), canceledAt: null
       })
 
       const queryPaymentMethod = await Transaction.aggregate([
-        { $match: { eventId: mongoose.Types.ObjectId(req.params.eventId) } },
+        { $match: { eventId: mongoose.Types.ObjectId(req.params.eventId), canceledAt: null } },
         {
           $group: {
             _id: {$toLower: '$paymentMethod'},
@@ -29,7 +29,7 @@ export default {
         
       const queryProducts = await Transaction.aggregate([
         {
-          $match: { 'eventId': mongoose.Types.ObjectId(req.params.eventId) }
+          $match: { 'eventId': mongoose.Types.ObjectId(req.params.eventId), 'canceledAt': null }
         },
         {
           $unwind: '$products'
