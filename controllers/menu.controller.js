@@ -63,49 +63,30 @@ export default {
 
   // Find all menus
   findAll: async (req, res) => {
-    Producer.aggregate([
-      { 
-        $match: { 
-          'events._id': mongoose.Types.ObjectId(req.params.eventId),
-          'userId': req.userId
-        },
-      },
-      { $unwind: '$events' }, 
-      { $unwind: '$events.menus' },
-      { 
-        $match: {
-          'events.menus.name': {$regex: req.query.name || '', $options: 'i'}
-        } 
-      },
-      { 
-        $group: {
-          _id: null,
-          menus: {
-            $push: {
-              _id: '$events.menus._id',
-              name: '$events.menus.name',
-              isEnabled: '$events.menus.isEnabled',
-              productsIds: '$events.menus.productsIds',
-            }
-          } 
-        } 
-      }
-    ])
-      .then(menus => {
-        if(!menus || menus[0] === undefined) {
+    Producer.findOne(Filter(req, {
+      'events._id': req.params.eventId,
+      'userId': req.userId
+    }), 'events.$')
+      .then(producer => {
+        if(!producer) {
           return Result.NotFound.NoRecordsFound(res)
         }
-        
-        menus = menus[0].menus.map((menu) => {
-          return { ...menu, totalProducts: menu.productsIds.length }
+        const event = producer.events.id(req.params.eventId)
+        const menus = event.menus.map((menu) => {
+          return {
+            _id: menu._id, 
+            name: menu.name,
+            isEnabled: menu.isEnabled,
+            productsIds: menu.productsIds,
+            totalProducts: menu.productsIds.length
+          }
         }, [])
-
         return Result.Success.SuccessOnSearch(res, menus)
       }).catch(err => {
         if(err.kind === 'ObjectId') {
           return Result.NotFound.NoRecordsFound(res)
         }
-        return Result.Error.ErrorOnSearch(res, err.message)
+        return Result.Error.ErrorOnSearch(res)
       })
   },
 

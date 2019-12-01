@@ -36,46 +36,26 @@ export default {
 
   // Find all devices
   findAll: async (req, res) => {
-    Producer.aggregate([
-      { 
-        $match: { 
-          'events._id': mongoose.Types.ObjectId(req.params.eventId),
-          'userId': req.userId
-        },
-      },
-      { $unwind: '$events' }, 
-      { $unwind: '$events.devices' },
-      { 
-        $match: {
-          'events.devices.name': {$regex: req.query.name || '', $options: 'i'}
-        } 
-      },
-      { 
-        $group: {
-          _id: null,
-          devices: {
-            $push: {
-              _id: '$events.devices._id',
-              name: '$events.devices.name',
-              isEnabled: '$events.devices.isEnabled',
-              productsIds: '$events.devices.productsIds',
-              acquirer: '$events.devices.acquirer',
-              isQRCodeEnabled: '$events.devices.isQRCodeEnabled',
-              menusIds: '$events.devices.menusIds'
-            }
-          } 
-        } 
-      }
-    ])
-      .then(devices => {
-        if(!devices || devices[0] === undefined) {
+    Producer.findOne({
+      'events._id': req.params.eventId,
+      'userId': req.userId
+    }, 'events.$')
+      .then(producer => {
+        if(!producer) {
           return Result.NotFound.NoRecordsFound(res)
         }
-        
-        devices = devices[0].devices.map((device) => {
-          return { ...device, totalMenus: device.menusIds.length }
+        const event = producer.events.id(req.params.eventId)
+        const devices = event.devices.map((device) => {
+          return {
+            _id: device._id, 
+            name: device.name,
+            isEnabled: device.isEnabled,
+            acquirer: device.acquirer,
+            isQRCodeEnabled: device.isQRCodeEnabled,
+            menusIds: device.menusIds,
+            totalMenus: device.menusIds.length
+          }
         }, [])
-
         return Result.Success.SuccessOnSearch(res, devices)
       }).catch(err => {
         if(err.kind === 'ObjectId') {
