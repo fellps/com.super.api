@@ -381,16 +381,17 @@ export default {
       return p
     })
 
-    let productsCanceledOrdered = {
+    const productsCanceledOrdered = productsCanceled.length > 0 && productsCanceled.sort((a, b) => a.name.localeCompare(b.name))
+
+    let total = {
       count: 0,
       totalAmount: 0
     }
-    if (productsCanceled.length > 0) {
-      productsCanceled.sort((a, b) => a.name.localeCompare(b.name))
-    }
-
     const paymentMethod = queryPaymentMethod.length > 0 && queryPaymentMethod.map(pm => {
       let paymentMethod = getPaymentMethod(pm._id)
+      
+      total.count += pm.count
+      total.totalAmount += pm.totalAmount
 
       return {
         id: pm._id,
@@ -399,22 +400,37 @@ export default {
         totalAmount: pm.totalAmount
       }
     })
+    const paymentMethodTotal = {
+      ...total
+    }
 
-    const paymentMethodCanceled = queryPaymentMethodCanceled.length > 0 && queryPaymentMethodCanceled.map(pm => {
-      let paymentMethod = getPaymentMethod(pm._id)
+    let paymentMethodCanceled = [{
+      count: 0,
+      totalAmount: 0
+    }]
+    
+    if (queryPaymentMethodCanceled.length > 0) {
+      paymentMethodCanceled = queryPaymentMethodCanceled.map(pm => {
+        let paymentMethod = getPaymentMethod(pm._id)
 
-      return {
-        paymentMethod: paymentMethod,
-        count: pm.count,
-        totalAmount: pm.totalAmount
-      }
-    })
+        return {
+          paymentMethod: paymentMethod,
+          count: pm.count,
+          totalAmount: pm.totalAmount
+        }
+      })
+    }
+
+    if (paymentMethodCanceled.length > 0) {
+      paymentMethodCanceled = paymentMethodCanceled.shift()
+    }
 
     const result = {
       products: products || [],
       productsCanceled: productsCanceledOrdered || [],
       paymentMethod: paymentMethod || [],
-      paymentMethodCanceled: paymentMethodCanceled.length > 0 ? paymentMethodCanceled.shift() : []
+      paymentMethodTotal: paymentMethodTotal,
+      paymentMethodCanceled: paymentMethodCanceled
     }
 
     return Result.Success.SuccessOnSearch(res, result)
