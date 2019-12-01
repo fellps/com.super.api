@@ -10,6 +10,11 @@ export default {
       return Result.Error.RequiredBody(res)
     }
 
+    if (req.body.addressNumber === 'NaN')
+      req.body.addressNumber = '0'
+
+      console.log(req.body)
+
     Producer.findOne({
       _id: req.params.producerId,
       userId: req.userId
@@ -44,13 +49,12 @@ export default {
   // Find all events
   findAll: async (req, res) => {
     Producer.find(Filter(req, {
-      userId: req.userId,
+      //userId: req.userId,
       events: {$exists: true, $not: {$size: 0}}
     }))
       .then(producer => {
-        const events = producer.reduce((events, producer) => {
-          events.push(producer.events.shift())
-          return events
+        const events = producer[0].events.map(event => {
+          return event
         }, [])
         return Result.Success.SuccessOnSearch(res, events)
       }).catch(err => {
@@ -65,7 +69,7 @@ export default {
   findOne: async (req, res) => {
     Producer.findOne(Filter(req, {
       'events._id': req.params.eventId,
-      'userId': req.userId
+      //'userId': req.userId
     }), 'events.$')
       .then(producer => {
         if(!producer) {
@@ -90,7 +94,7 @@ export default {
 
     Producer.findOneAndUpdate({
       'events._id': req.params.eventId,
-      'userId': req.userId
+      //'userId': req.userId
     }, {
       'events.$.name': req.body.name,
       'events.$.startDate': req.body.startDate,
@@ -121,7 +125,7 @@ export default {
   delete: async (req, res) => {
     Producer.findOne({
       'events._id': req.params.eventId,
-      'userId': req.userId
+      //'userId': req.userId
     })
       .then(producer => {
         if(!producer) {
