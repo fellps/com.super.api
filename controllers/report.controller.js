@@ -381,7 +381,10 @@ export default {
       return p
     })
 
-    const productsCanceledOrdered = productsCanceled.sort((a, b) => a.name.localeCompare(b.name))
+    let productsCanceledOrdered 
+    if (productsCanceled.length > 0) {
+      productsCanceled.sort((a, b) => a.name.localeCompare(b.name))
+    }
 
     const paymentMethod = queryPaymentMethod.length > 0 && queryPaymentMethod.map(pm => {
       let paymentMethod = getPaymentMethod(pm._id)
