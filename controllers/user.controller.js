@@ -1,4 +1,6 @@
 import User from '../models/user.model'
+import Transaction from '../models/transaction.model'
+import mongoose from 'mongoose'
 import Result from '../modules/result'
 import Crypto from 'crypto'
 import Filter from '../modules/filterCreator'
@@ -103,5 +105,17 @@ export default {
         }
         return Result.InternalError.ErrorOnOperation(res)
       })
+  },
+
+  findAllCashiers: async (req, res) => {
+    const cashiers = await Transaction.distinct('loggedUserDocument', { 
+      eventId: mongoose.Types.ObjectId(req.params.eventId)
+    })
+
+    const result = {
+      cashiers
+    }
+
+    return Result.Success.SuccessOnSearch(res, result)
   }
 }

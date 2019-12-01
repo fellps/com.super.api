@@ -254,6 +254,166 @@ export default {
   },
 
   // Cashier closing report
+  singleCashierClosing: async (req, res) => {
+    if (_.isEmpty(req.params.eventId) || _.isEmpty(req.params.cpf))
+      return Result.Error.ErrorOnSearch(res, 'Informe os parametros antes de continuar!')
+
+    const queryPaymentMethod = await Transaction.aggregate([
+      { 
+        $match: {           
+          eventId: mongoose.Types.ObjectId(req.params.eventId),
+          loggedUserDocument: req.params.cpf,
+          canceledAt: null  
+        }
+      },
+      {
+        $group: {
+          _id: {$toLower: '$paymentMethod'},
+          count: { $sum: 1 },
+          totalAmount: { $sum: '$amount' }
+        }
+      }
+    ])
+
+    const queryPaymentMethodCanceled = await Transaction.aggregate([
+      { 
+        $match: {           
+          eventId: mongoose.Types.ObjectId(req.params.eventId),
+          loggedUserDocument: req.params.cpf,
+          canceledAt: { $exists: true, $ne: null }
+        }
+      },
+      {
+        $group: {
+          _id: { },
+          count: { $sum: 1 },
+          totalAmount: { $sum: '$amount' }
+        }
+      }
+    ])
+    
+    const queryProducts = await Transaction.aggregate([
+      {
+        $match: { 
+          eventId: mongoose.Types.ObjectId(req.params.eventId),
+          loggedUserDocument: req.params.cpf,
+          canceledAt: null 
+        }
+      },
+      {
+        $unwind: '$products'
+      }, 
+      {
+        $group: {
+          _id: {
+            product: '$products._id'
+          },
+          totalCount: { $sum: '$products.count' },
+          totalAmount: { $sum: { $multiply: ['$products.count', '$products.value'] } }
+        }
+      },
+      { $sort : { totalCount: -1 } },
+      {
+        $group: {
+          _id: null,
+          products: {
+            $push: {
+              id: '$_id.product',
+              totalCount: '$totalCount',
+              totalAmount: '$totalAmount'
+            }
+          }
+        }
+      }
+    ])
+
+    const queryProductsCanceled = await Transaction.aggregate([
+      {
+        $match: { 
+          eventId: mongoose.Types.ObjectId(req.params.eventId),
+          loggedUserDocument: req.params.cpf,
+          canceledAt: { $exists: true, $ne: null }
+        }
+      },
+      {
+        $unwind: '$products'
+      }, 
+      {
+        $group: {
+          _id: {
+            product: '$products._id',
+            paymentMethod: '$paymentMethod'
+          },
+          totalCount: { $sum: '$products.count' },
+          totalAmount: { $sum: { $multiply: ['$products.count', '$products.value'] } }
+        }
+      },
+      { $sort : { 'products.id': -1 } },
+      {
+        $group: {
+          _id: null,
+          products: {
+            $push: {
+              id: '$_id.product',
+              paymentMethod: '$_id.paymentMethod',
+              totalCount: '$totalCount',
+              totalAmount: '$totalAmount'
+            }
+          }
+        }
+      }
+    ])
+
+    const producer = await Producer.findOne({
+      'events._id': req.params.eventId,
+    }, 'events.$').exec()
+
+    const products = queryProducts.length > 0 && queryProducts.shift().products.map(p => {
+      const product = producer.events[0].products.id(p.id)
+      p['name'] = product.name
+      return p
+    })
+
+    const productsCanceled = queryProductsCanceled.length > 0 && queryProductsCanceled.shift().products.map(p => {
+      const product = producer.events[0].products.id(p.id)
+      p['name'] = product.name
+      p['paymentMethod'] = getPaymentMethod(p.paymentMethod)
+      return p
+    })
+
+    const productsCanceledOrdered = productsCanceled.sort((a, b) => a.name.localeCompare(b.name))
+
+    const paymentMethod = queryPaymentMethod.length > 0 && queryPaymentMethod.map(pm => {
+      let paymentMethod = getPaymentMethod(pm._id)
+
+      return {
+        id: pm._id,
+        paymentMethod: paymentMethod,
+        count: pm.count,
+        totalAmount: pm.totalAmount
+      }
+    })
+
+    const paymentMethodCanceled = queryPaymentMethodCanceled.length > 0 && queryPaymentMethodCanceled.map(pm => {
+      let paymentMethod = getPaymentMethod(pm._id)
+
+      return {
+        paymentMethod: paymentMethod,
+        count: pm.count,
+        totalAmount: pm.totalAmount
+      }
+    })
+
+    const result = {
+      products: products || [],
+      productsCanceled: productsCanceledOrdered || [],
+      paymentMethod: paymentMethod || [],
+      paymentMethodCanceled: paymentMethodCanceled.length > 0 ? paymentMethodCanceled.shift() : []
+    }
+
+    return Result.Success.SuccessOnSearch(res, result)
+  },
+
   cashierClosing: async (req, res) => {
     if (_.isEmpty(req.params.eventId) || _.isEmpty(req.params.cpf))
       return Result.Error.ErrorOnSearch(res, 'Informe os parametros antes de continuar!')
