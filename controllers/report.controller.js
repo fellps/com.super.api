@@ -381,7 +381,10 @@ export default {
       return p
     })
 
-    let productsCanceledOrdered 
+    let productsCanceledOrdered = {
+      count: 0,
+      totalAmount: 0
+    }
     if (productsCanceled.length > 0) {
       productsCanceled.sort((a, b) => a.name.localeCompare(b.name))
     }
