@@ -9,6 +9,7 @@ import Auth from './auth.route'
 import Report from './report.route'
 import POS from './pos.route'
 import Acquirer from './acquirer.route'
+import External from './external.route'
 
 import Result from '../modules/result'
 import VerifyJWT from '../modules/jwt'
@@ -30,5 +31,6 @@ app
   .use('/auth', Auth)
   .use('/pos', Decode, POS)
   .use('/acquirers', VerifyJWT, Acquirer)
+  .use('/external', External)
 
 export default app
