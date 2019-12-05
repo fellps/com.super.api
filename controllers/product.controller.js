@@ -12,7 +12,7 @@ export default {
 
     Producer.updateOne({
       'events._id': req.params.eventId,
-      'userId': req.userId
+      //'userId': req.userId
     },
     {
       $push: {
@@ -30,7 +30,7 @@ export default {
   findAll: async (req, res) => {
     Producer.findOne(Filter(req, {
       'events._id': req.params.eventId,
-      'userId': req.userId
+      //'userId': req.userId
     }), 'events.$')
       .then(producer => {
         if(!producer) {
@@ -50,7 +50,7 @@ export default {
   findOne: async (req, res) => {
     Producer.findOne(Filter(req, {
       'events.products._id': req.params.productId,
-      'userId': req.userId
+      //'userId': req.userId
     }), 'events.$')
       .then(producer => {
         if(!producer && !producer.events[0]) {
@@ -74,7 +74,7 @@ export default {
 
     Producer.updateMany(
       {
-        'userId': req.userId
+        //'userId': req.userId
       }, 
       { 
         $set: {
@@ -98,7 +98,7 @@ export default {
   delete: async (req, res) => {
     Producer.updateOne({ 
       'events.products._id': req.params.productId,
-      'userId': req.userId
+      //'userId': req.userId
     }, { 
       $pull: { 
         'events.$.products': { '_id': req.params.productId } 

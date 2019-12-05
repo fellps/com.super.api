@@ -31,7 +31,7 @@ export default {
     try {
       await Producer.findOneAndUpdate({
         'events._id': req.params.eventId,
-        'userId': req.userId
+        //'userId': req.userId
       },
       {
         $push: {
@@ -41,7 +41,7 @@ export default {
 
       await Producer.findOneAndUpdate({
         'events._id': req.params.eventId,
-        'userId': req.userId
+        //'userId': req.userId
       },
       {
         $push: {
@@ -65,7 +65,7 @@ export default {
   findAll: async (req, res) => {
     Producer.findOne(Filter(req, {
       'events._id': req.params.eventId,
-      'userId': req.userId
+      //'userId': req.userId
     }), 'events.$')
       .then(producer => {
         if(!producer) {
@@ -94,7 +94,7 @@ export default {
   findOne: async (req, res) => {
     Producer.findOne(Filter(req, {
       'events.menus._id': req.params.menuId,
-      'userId': req.userId
+      //'userId': req.userId
     }), 'events.$')
       .then(producer => {
         if(!producer && !producer.events[0]) {
@@ -158,7 +158,7 @@ export default {
     try {
       await Producer.updateMany(
         {
-          'userId': req.userId
+          //'userId': req.userId
         }, 
         { 
           $set: {
@@ -182,7 +182,7 @@ export default {
         if (id !== undefined) {
           await Producer.updateMany(
             {
-              'userId': req.userId
+              //'userId': req.userId
             }, 
             { 
               $set: {
@@ -199,7 +199,7 @@ export default {
         } else {
           await Producer.updateOne({
             'events.menus._id': req.params.menuId,
-            'userId': req.userId
+            //'userId': req.userId
           },
           {
             $push: {
@@ -230,7 +230,7 @@ export default {
   delete: async (req, res) => {
     Producer.updateOne({ 
       'events.menus._id': req.params.menuId,
-      'userId': req.userId
+      //'userId': req.userId
     }, { 
       $pull: { 
         'events.$.menus': { '_id': req.params.menuId } 

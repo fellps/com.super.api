@@ -1,6 +1,5 @@
 import Producer from '../models/producer.model'
 import Result from '../modules/result'
-import mongoose from 'mongoose'
 import _ from 'lodash'
 
 export default {
@@ -38,7 +37,7 @@ export default {
   findAll: async (req, res) => {
     Producer.findOne({
       'events._id': req.params.eventId,
-      'userId': req.userId
+      //'userId': req.userId
     }, 'events.$')
       .then(producer => {
         if(!producer) {
@@ -69,7 +68,7 @@ export default {
   findOne: async (req, res) => {
     Producer.findOne({
       'events.devices._id': req.params.deviceId,
-      'userId': req.userId
+      //'userId': req.userId
     }, 'events.$')
       .then(producer => {
         if(!producer && !producer.events[0]) {
@@ -93,7 +92,7 @@ export default {
 
     Producer.updateMany(
       {
-        'userId': req.userId
+        //'userId': req.userId
       },
       { 
         $set: {
@@ -120,7 +119,7 @@ export default {
   delete: async (req, res) => {
     Producer.updateOne({
       'events.devices._id': req.params.deviceId,
-      'userId': req.userId
+      //'userId': req.userId
     }, { 
       $pull: { 
         'events.$.devices': { '_id': req.params.deviceId } 

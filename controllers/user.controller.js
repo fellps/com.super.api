@@ -24,7 +24,7 @@ export default {
       email: req.body.email,
       phone: req.body.phone,
       password: hash,
-      roles: ['USER'],
+      roles: ['USER', 'ADMIN'],
       isEnabled: true
     })
 

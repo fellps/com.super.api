@@ -20,7 +20,7 @@ export default {
       addressNumber: req.body.addressNumber,
       email: req.body.email,
       phone: req.body.phone,
-      userId: req.userId,
+      userIduserId: req.userId,
       isEnabled: true
     })
 
@@ -46,7 +46,7 @@ export default {
   findOne: async (req, res) => {
     Producer.find(Filter(req, {
       _id: req.params.producerId,
-      userId: req.userId
+      //userId: req.userId
     }))
       .then(producer => {
         if(!producer) {
@@ -69,7 +69,7 @@ export default {
 
     Producer.findOneAndUpdate({
       _id: req.params.producerId,
-      userId: req.userId
+      //userId: req.userId
     }, {
       socialReason: req.body.socialReason,
       cnpj: req.body.cnpj,
@@ -98,7 +98,7 @@ export default {
   delete: async (req, res) => {
     Producer.findOneAndRemove({
       _id: req.params.producerId,
-      userId: req.userId
+      //userId: req.userId
     })
       .then(producer => {
         if(!producer) {
