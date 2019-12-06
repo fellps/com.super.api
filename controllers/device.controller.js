@@ -19,7 +19,7 @@ export default {
 
     Producer.updateOne({ 
       'events._id': req.params.eventId,
-      'userId': req.userId
+      //'userId': req.userId
     },
     {
       $push: {
