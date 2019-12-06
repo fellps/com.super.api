@@ -10,6 +10,9 @@ export default {
       return Result.Error.RequiredBody(res)
     }
 
+    if (req.body.addressNumber === 'NaN')
+      req.body.addressNumber = '0'
+
     const producer = new Producer({
       socialReason: req.body.socialReason,
       cnpj: req.body.cnpj,

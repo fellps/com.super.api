@@ -13,7 +13,7 @@ export default {
     if (req.body.addressNumber === 'NaN')
       req.body.addressNumber = '0'
 
-      console.log(req.body)
+    console.log(req.body)
 
     Producer.findOne({
       _id: req.params.producerId,
