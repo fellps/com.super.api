@@ -23,7 +23,7 @@ export default {
       addressNumber: req.body.addressNumber,
       email: req.body.email,
       phone: req.body.phone,
-      userIduserId: req.userId,
+      userId: req.userId,
       isEnabled: true
     })
 

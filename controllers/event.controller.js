@@ -17,7 +17,7 @@ export default {
 
     Producer.findOne({
       _id: req.params.producerId,
-      userId: req.userId
+      //userId: req.userId
     })
       .then(producer => {
         if(!producer) {
