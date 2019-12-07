@@ -1,7 +1,7 @@
 import Producer from '../models/producer.model'
 import Result from '../modules/result'
 import Filter from '../modules/filterCreator'
-import mongoose from 'mongoose'
+import moment from 'moment-timezone'
 import _ from 'lodash'
 import uuid from 'uuid'
 
@@ -165,7 +165,7 @@ export default {
             'events.$[].menus.$[menu].name': req.body.name,
             'events.$[].menus.$[menu].isEnabled': req.body.isEnabled == 'true',
             'events.$[].menus.$[menu].productsIds': productsIds,
-            'events.$[].menus.$[menu].updatedAt': new Date()
+            'events.$[].menus.$[menu].updatedAt': moment().tz('America/Sao_Paulo').format('YYYY-MM-DD HH:mm:ss.SSS')
           }
         },
         {

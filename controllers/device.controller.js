@@ -1,5 +1,6 @@
 import Producer from '../models/producer.model'
 import Result from '../modules/result'
+import moment from 'moment-timezone'
 import _ from 'lodash'
 
 export default {
@@ -104,7 +105,7 @@ export default {
           'events.$[].devices.$[device].acquirer': req.body.acquirer,
           'events.$[].devices.$[device].isEnabled': req.body.isEnabled,
           'events.$[].devices.$[device].isQRCodeEnabled': req.body.isQRCodeEnabled,
-          'events.$[].devices.$[device].updatedAt': new Date()
+          'events.$[].devices.$[device].updatedAt': moment().tz('America/Sao_Paulo').format('YYYY-MM-DD HH:mm:ss.SSS')
         }
       },
       {
