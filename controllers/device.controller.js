@@ -9,6 +9,9 @@ export default {
       return Result.Error.RequiredBody(res)
     }
 
+    if (req.body.isQRCodeEnabled === void (0))
+      req.body.isQRCodeEnabled = false
+
     const device = {
       name: req.body.name,
       menusIds: req.body.menusIds,

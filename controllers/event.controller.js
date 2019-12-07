@@ -13,8 +13,6 @@ export default {
     if (req.body.addressNumber === 'NaN')
       req.body.addressNumber = '0'
 
-    console.log(req.body)
-
     Producer.findOne({
       _id: req.params.producerId,
       //userId: req.userId
@@ -52,10 +50,13 @@ export default {
       //userId: req.userId,
       events: {$exists: true, $not: {$size: 0}}
     }))
-      .then(producer => {
-        const events = producer[0].events.map(event => {
-          return event
-        }, [])
+      .then(producers => {
+        let events = []
+        producers.forEach((producer) => {
+          producer.events.forEach(event => {
+            events.push(event)
+          })
+        })
         return Result.Success.SuccessOnSearch(res, events)
       }).catch(err => {
         if(err.kind === 'ObjectId') {
@@ -91,6 +92,9 @@ export default {
     if(!req.body) {
       return Result.Error.RequiredBody(res)
     }
+
+    if (req.body.addressNumber === 'NaN')
+      req.body.addressNumber = '0'
 
     Producer.findOneAndUpdate({
       'events._id': req.params.eventId,

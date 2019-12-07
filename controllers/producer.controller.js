@@ -70,6 +70,9 @@ export default {
       return Result.Error.RequiredBody(res)
     }
 
+    if (req.body.addressNumber === 'NaN')
+      req.body.addressNumber = '0'
+
     Producer.findOneAndUpdate({
       _id: req.params.producerId,
       //userId: req.userId

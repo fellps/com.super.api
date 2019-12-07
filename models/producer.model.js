@@ -3,14 +3,14 @@ import { EventSchema } from './event.model'
 
 export const ProducerSchema = mongoose.Schema({
   socialReason: String,
-  cnpj: Number,
-  cep: Number,
+  cnpj: String,
+  cep: String,
   state: String,
   city: String,
   address: String,
-  addressNumber: Number,
+  addressNumber: String,
   email: String,
-  phone: Number,
+  phone: String,
   events: [EventSchema],
   isEnabled: Boolean,
   userId: {
