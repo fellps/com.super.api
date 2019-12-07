@@ -145,7 +145,9 @@ export default {
   // Update POS
   update: async (req, res) => {
     try {
+      
       console.log('Device date: ' + req.body.Date)
+      req.body.Date = req.body.Date.replace('-02:00', '-03:00')
       console.log('Date convert: ' + moment(req.body.Date).tz('America/Sao_Paulo').format('YYYY-MM-DD HH:mm:ss.SSS'))
 
       const date = moment(req.body.Date).tz('America/Sao_Paulo').format('YYYY-MM-DD HH:mm:ss.SSS')
