@@ -2,6 +2,7 @@ import Result from '../modules/result'
 import Producer from '../models/producer.model'
 import Transaction from '../models/transaction.model'
 
+import moment from 'moment-timezone'
 import mongoose from 'mongoose'
 import _ from 'lodash'
 
@@ -145,10 +146,9 @@ export default {
   update: async (req, res) => {
     try {
       console.log('Device date: ' + req.body.Date)
-      console.log('Date convert: ' + new Date(req.body.Date))
+      console.log('Date convert: ' + moment(req.body.Date).tz('America/Sao_Paulo').format('YYYY-MM-DD HH:mm:ss.SSS'))
 
-      const date = new Date(req.body.Date)
-      date.setHours(date.getHours() - 3)
+      const date = moment(req.body.Date).tz('America/Sao_Paulo').format('YYYY-MM-DD HH:mm:ss.SSS')
 
       let result = {}
 
