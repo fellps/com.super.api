@@ -147,6 +147,9 @@ export default {
       return Result.Error.RequiredBody(res)
     }
 
+    if (req.body.products === void (0))
+      req.body.products = []
+      
     var productsIds = Object.keys(req.body.products).map((key) => {
       const id = req.body.products[key]['_id']
       return id !== undefined ? id : key
