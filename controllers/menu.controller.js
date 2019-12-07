@@ -103,7 +103,7 @@ export default {
         const menu = producer.events[0].menus.id(req.params.menuId)
 
         Producer.aggregate([
-          { $match: { 'userId': req.userId } },
+          //{ $match: { 'userId': req.userId } },
           { $unwind: '$events' }, 
           { $unwind: '$events.products' }, 
           { 
