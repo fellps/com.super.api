@@ -144,6 +144,12 @@ export default {
   // Update POS
   update: async (req, res) => {
     try {
+      console.log('Device date: ' + req.body.Date)
+      console.log('Date convert: ' + new Date(req.body.Date))
+
+      const date = new Date(req.body.Date)
+      date.setHours(date.getHours() - 3)
+
       let result = {}
 
       let menus = await Producer.aggregate([
@@ -152,7 +158,7 @@ export default {
         { $unwind: '$events.menus' },
         { 
           $match: {
-            'events.menus.updatedAt': { $gt: new Date(req.body.Date) } 
+            'events.menus.updatedAt': { $gt: date } 
           } 
         },
         { $group: { _id: '$events.menus' } }
@@ -185,7 +191,7 @@ export default {
         { $unwind: '$events.devices' },
         { 
           $match: {
-            'events.devices.updatedAt': { $gt: new Date(req.body.Date) } 
+            'events.devices.updatedAt': { $gt: date } 
           } 
         },
         { $group: { _id: '$events.devices' } }
