@@ -177,43 +177,49 @@ export default {
           }]
         })
 
+      let arrToValidate = []
+
       Object.keys(req.body.products).forEach(async (key) => {
-        const id = req.body.products[key]['_id']
-        let color = req.body.products[key]['color']
-        color = !_.isEmpty(color) ? color : '#000000'
-        
-        if (id !== undefined) {
-          await Producer.updateMany(
-            {
+        if (!arrToValidate.includes(key)) {
+          arrToValidate.push(key)
+          
+          const id = req.body.products[key]['_id']
+          let color = req.body.products[key]['color']
+          color = !_.isEmpty(color) ? color : '#000000'
+          
+          if (id !== undefined) {
+            await Producer.updateMany(
+              {
+                //'userId': req.userId
+              }, 
+              { 
+                $set: {
+                  'events.$[].products.$[product].name': req.body.products[key]['name'],
+                  'events.$[].products.$[product].value': req.body.products[key]['value'],
+                  'events.$[].products.$[product].color': color
+                }
+              },
+              {
+                arrayFilters: [{ 
+                  'product._id': id !== undefined ? id : key
+                }]
+              })
+          } else {
+            await Producer.updateOne({
+              'events.menus._id': req.params.menuId,
               //'userId': req.userId
-            }, 
-            { 
-              $set: {
-                'events.$[].products.$[product].name': req.body.products[key]['name'],
-                'events.$[].products.$[product].value': req.body.products[key]['value'],
-                'events.$[].products.$[product].color': color
-              }
             },
             {
-              arrayFilters: [{ 
-                'product._id': id !== undefined ? id : key
-              }]
-            })
-        } else {
-          await Producer.updateOne({
-            'events.menus._id': req.params.menuId,
-            //'userId': req.userId
-          },
-          {
-            $push: {
-              'events.$.products': {
-                '_id': key,
-                'name': req.body.products[key]['name'],
-                'value': req.body.products[key]['value'],
-                'color': color
+              $push: {
+                'events.$.products': {
+                  '_id': key,
+                  'name': req.body.products[key]['name'],
+                  'value': req.body.products[key]['value'],
+                  'color': color
+                }
               }
-            }
-          })
+            })
+          }
         }
       })
   
