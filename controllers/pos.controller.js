@@ -145,12 +145,13 @@ export default {
   // Update POS
   update: async (req, res) => {
     try {
-      
-      console.log('Device date: ' + req.body.Date)
       req.body.Date = req.body.Date.replace('-02:00', '-03:00')
-      console.log('Date convert: ' + moment(req.body.Date).tz('America/Sao_Paulo').format('YYYY-MM-DD HH:mm:ss.SSS'))
 
-      const date = moment(req.body.Date).tz('America/Sao_Paulo').format('YYYY-MM-DD HH:mm:ss.SSS')
+      console.log(req.body)
+
+      const date = moment(req.body.Date).tz('America/Sao_Paulo').format('YYYY-MM-DD HH:mm:ss')
+
+      const dateObj = new Date(date)
 
       let result = {}
 
@@ -160,7 +161,7 @@ export default {
         { $unwind: '$events.menus' },
         { 
           $match: {
-            'events.menus.updatedAt': { $gt: date } 
+            'events.menus.updatedAt': { $gt: dateObj } 
           } 
         },
         { $group: { _id: '$events.menus' } }
@@ -193,7 +194,7 @@ export default {
         { $unwind: '$events.devices' },
         { 
           $match: {
-            'events.devices.updatedAt': { $gt: date } 
+            'events.devices.updatedAt': { $gt: dateObj } 
           } 
         },
         { $group: { _id: '$events.devices' } }
