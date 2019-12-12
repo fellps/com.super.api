@@ -16,6 +16,7 @@ export default {
       _id: uuid(),
       name: req.body.name,
       isEnabled: true,
+      updatedAt: moment().tz('America/Sao_Paulo').format('YYYY-MM-DD HH:mm:ss.SSS'),
       productsIds: Object.keys(req.body.products)
     }
 
