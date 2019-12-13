@@ -147,8 +147,6 @@ export default {
     try {
       req.body.Date = req.body.Date.replace('-02:00', '-03:00')
 
-      console.log(req.body)
-
       const date = moment(req.body.Date).tz('America/Sao_Paulo').format('YYYY-MM-DD HH:mm:ss')
 
       const dateObj = new Date(date)
@@ -161,6 +159,7 @@ export default {
         { $unwind: '$events.menus' },
         { 
           $match: {
+            'events._id': mongoose.Types.ObjectId(getObjectIdFromGuid(req.body.IdEvent)),
             'events.menus.updatedAt': { $gt: dateObj } 
           } 
         },
@@ -194,6 +193,7 @@ export default {
         { $unwind: '$events.devices' },
         { 
           $match: {
+            'events.devices._id': mongoose.Types.ObjectId(getObjectIdFromGuid(req.body.IdPOS)),
             'events.devices.updatedAt': { $gt: dateObj } 
           } 
         },
