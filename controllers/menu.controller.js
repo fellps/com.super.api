@@ -119,6 +119,8 @@ export default {
               return key._id
             }, [])
 
+            products = _.orderBy(products, ['name'],['asc'])
+
             return Result.Success.SuccessOnSearch(res, {
               _id: menu._id, 
               name: menu.name,
