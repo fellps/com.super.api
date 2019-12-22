@@ -20,8 +20,32 @@ export default {
         if(!event && !event.events[0]) {
           return Result.NotFound.NoRecordsFound(res)
         }
+
+        const data = event.events.shift()
+
+        const products = data.products
+        const menus = []
+        const devices = []
+        const device = _.find(data.devices, {_id: mongoose.Types.ObjectId(req.body.IdPOS) })
+        devices.push(device)
+
+        _.forEach(device.menusIds, id => {
+          const menu = _.find(data.menus, {_id: id })
+          if (menu !== void(0)) {
+            menus.push(menu)
+          }
+        })
+
+        const result = {
+          devices,
+          products,
+          menus,
+          _id: data._id,
+          name: data.name,
+          managerPassword: data.managerPassword
+        }
         
-        return Result.Success.SuccessOnSearch(res, event.events.shift())
+        return Result.Success.SuccessOnSearch(res, result)
       }).catch(err => {
         if(err.kind === 'ObjectId') {
           return Result.NotFound.NoRecordsFound(res)
