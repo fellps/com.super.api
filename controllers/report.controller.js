@@ -2,6 +2,7 @@ import Transaction from '../models/transaction.model'
 import Producer from '../models/producer.model'
 import mongoose from 'mongoose'
 import Result from '../modules/result'
+import moment from 'moment-timezone'
 import _ from 'lodash'
 
 function getPaymentMethod (paymentMethodId) {
@@ -258,12 +259,24 @@ export default {
     if (_.isEmpty(req.params.eventId) || _.isEmpty(req.params.cpf))
       return Result.Error.ErrorOnSearch(res, 'Informe os parametros antes de continuar!')
 
+    if (_.isEmpty(req.query.startAt))
+      req.query.startAt = '2019-01-01T00:00:00'
+    if (_.isEmpty(req.query.endAt))
+      req.query.endAt = '2099-01-01T00:00:00'
+
+    const startAt = moment(req.query.startAt).tz('America/Sao_Paulo').format('YYYY-MM-DD HH:mm:ss')
+    const endAt = moment(req.query.endAt).tz('America/Sao_Paulo').format('YYYY-MM-DD HH:mm:ss')
+
+    const startAtObj = new Date(startAt)
+    const endAtObj = new Date(endAt)
+
     const queryPaymentMethod = await Transaction.aggregate([
       { 
         $match: {           
           eventId: mongoose.Types.ObjectId(req.params.eventId),
           loggedUserDocument: req.params.cpf,
-          canceledAt: null  
+          canceledAt: null,
+          createdAt: { $gte: startAtObj, $lte: endAtObj },
         }
       },
       {
@@ -280,7 +293,8 @@ export default {
         $match: {           
           eventId: mongoose.Types.ObjectId(req.params.eventId),
           loggedUserDocument: req.params.cpf,
-          canceledAt: { $exists: true, $ne: null }
+          canceledAt: { $exists: true, $ne: null },
+          createdAt: { $gte: startAtObj, $lte: endAtObj }
         }
       },
       {
@@ -297,7 +311,8 @@ export default {
         $match: { 
           eventId: mongoose.Types.ObjectId(req.params.eventId),
           loggedUserDocument: req.params.cpf,
-          canceledAt: null 
+          canceledAt: null,
+          createdAt: { $gte: startAtObj, $lte: endAtObj }
         }
       },
       {
@@ -332,7 +347,8 @@ export default {
         $match: { 
           eventId: mongoose.Types.ObjectId(req.params.eventId),
           loggedUserDocument: req.params.cpf,
-          canceledAt: { $exists: true, $ne: null }
+          canceledAt: { $exists: true, $ne: null },
+          createdAt: { $gte: startAtObj, $lte: endAtObj }
         }
       },
       {
