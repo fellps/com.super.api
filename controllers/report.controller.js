@@ -260,12 +260,12 @@ export default {
       return Result.Error.ErrorOnSearch(res, 'Informe os parametros antes de continuar!')
 
     if (_.isEmpty(req.query.startAt))
-      req.query.startAt = '2019-01-01T00:00:00'
+      req.query.startAt = '01/01/2019'
     if (_.isEmpty(req.query.endAt))
-      req.query.endAt = '2099-01-01T00:00:00'
+      req.query.endAt = '01/01/2099'
 
-    const startAt = moment(req.query.startAt).tz('America/Sao_Paulo').format('YYYY-MM-DD HH:mm:ss')
-    const endAt = moment(req.query.endAt).tz('America/Sao_Paulo').format('YYYY-MM-DD HH:mm:ss')
+    const startAt = moment(req.query.startAt, 'DD/MM/YYYY').format('YYYY-MM-DD HH:mm:ss.SSS')
+    const endAt = moment(req.query.endAt, 'DD/MM/YYYY').format('YYYY-MM-DD HH:mm:ss.SSS')
 
     const startAtObj = new Date(startAt)
     const endAtObj = new Date(endAt)
