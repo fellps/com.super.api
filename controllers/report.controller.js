@@ -259,16 +259,14 @@ export default {
     if (_.isEmpty(req.params.eventId) || _.isEmpty(req.params.cpf))
       return Result.Error.ErrorOnSearch(res, 'Informe os parametros antes de continuar!')
 
-    if (_.isEmpty(req.query.startAt))
-      req.query.startAt = '01/01/2019'
-    if (_.isEmpty(req.query.endAt))
-      req.query.endAt = '01/01/2099'
+    const startAt = moment(req.query.startAt, 'DD/MM/YYYY HH:mm').format('YYYY-MM-DD HH:mm:ss.SSS')
+    const endAt = moment(req.query.endAt, 'DD/MM/YYYY HH:mm').format('YYYY-MM-DD HH:mm:ss.SSS')
 
-    const startAt = moment(req.query.startAt, 'DD/MM/YYYY').format('YYYY-MM-DD HH:mm:ss.SSS')
-    const endAt = moment(req.query.endAt, 'DD/MM/YYYY').format('YYYY-MM-DD HH:mm:ss.SSS')
+    let startAtObj = new Date(startAt)
+    let endAtObj = new Date(endAt)
 
-    const startAtObj = new Date(startAt)
-    const endAtObj = new Date(endAt)
+    startAtObj.setHours(startAtObj.getHours() - 2)
+    endAtObj.setHours(endAtObj.getHours() - 2)
 
     const queryPaymentMethod = await Transaction.aggregate([
       { 
