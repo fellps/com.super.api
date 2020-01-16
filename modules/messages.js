@@ -12,6 +12,7 @@ export default {
   ErrorOnSearch: 'Erro ao buscar registro',
   ErrorOnLogin: 'Usuário ou senha inválidos',
   ErrorPermission: 'Você não possui acesso! Entre em contato com o suporte!',
+  ErrorOnImageSave: 'Não foi possivel salvar a imagem',
   // NO RECORDS
   NoRecordsFound: 'Nenhum registro encontrado',
   NoRecordsToUpdate: 'Nenhum dado novo para atualizar',

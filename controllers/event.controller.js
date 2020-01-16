@@ -2,6 +2,7 @@ import Producer from '../models/producer.model'
 import Result from '../modules/result'
 import Filter from '../modules/filterCreator'
 import _ from 'lodash'
+import MD5 from 'MD5'
 
 export default {
   // Create event
@@ -12,6 +13,20 @@ export default {
 
     if (req.body.addressNumber === 'NaN')
       req.body.addressNumber = '0'
+
+    const uploadPath = __dirname + '/../uploads/'
+    let imagePath = ''
+    
+    if (req.files !== null) {
+      const image = req.files.image
+      const name = MD5(Math.random().toString(36) + image.md5) + '.' + image.name.split('.').pop()
+  
+      image.mv(uploadPath + name, async (err) => {
+        if (err) return Result.Error.ErrorOnImageSave()
+      })
+
+      imagePath = '/uploads/' + name
+    } 
 
     Producer.findOne({
       _id: req.params.producerId,
@@ -32,6 +47,7 @@ export default {
           addressNumber: req.body.addressNumber,
           description: req.body.description,
           managerPassword: req.body.managerPassword,
+          image: imagePath,
           isEnabled: true
         })
         producer.save()
@@ -95,6 +111,31 @@ export default {
 
     if (req.body.addressNumber === 'NaN')
       req.body.addressNumber = '0'
+    
+    const uploadPath = __dirname + '/../uploads/'
+    
+    if (req.files !== null) {
+      const image = req.files.image
+      const name = MD5(Math.random().toString(36) + image.md5) + '.' + image.name.split('.').pop()
+
+      image.mv(uploadPath + name, async (err) => {
+        if (err) return Result.Error.ErrorOnImageSave()
+        
+        Producer.findOneAndUpdate({
+          'events._id': req.params.eventId
+        },
+        {
+          'events.$.image': '/uploads/' + name
+        })
+          .then()
+          .catch(err => {
+            if(err.kind === 'ObjectId') {
+              return Result.NotFound.NoRecordsFound(res)
+            }
+            return Result.Error.ErrorOnImageSave(res, err.message)
+          })
+      })
+    }
 
     Producer.findOneAndUpdate({
       'events._id': req.params.eventId,

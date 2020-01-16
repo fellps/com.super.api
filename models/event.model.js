@@ -18,6 +18,7 @@ export const EventSchema = mongoose.Schema({
   devices: [DeviceSchema],
   producerId: String,
   managerPassword: String,
+  image: String,
   isEnabled: Boolean
 }, {
   timestamps: true

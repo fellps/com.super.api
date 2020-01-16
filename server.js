@@ -1,6 +1,7 @@
 import express from 'express'
 import bodyParser from 'body-parser'
 import mongoose from 'mongoose'
+import fileUpload from 'express-fileupload'
 import cors from 'cors'
 import routes from './routes'
 import 'dotenv/config'
@@ -11,6 +12,10 @@ var app = express()
 app.use(cors())
 app.use(bodyParser.urlencoded({ extended: true }))
 app.use(bodyParser.json())
+app.use(fileUpload({
+  limits: { fileSize: 5 * 1024 * 1024 },
+}))
+app.use('/uploads', express.static('uploads'))
 
 app.use((req, res, next) => {
   console.log(`Request coming => ${req.originalUrl}`)
