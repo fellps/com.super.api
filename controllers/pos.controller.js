@@ -42,6 +42,7 @@ export default {
           menus,
           _id: data._id,
           name: data.name,
+          image: 'https://api-prd.bdbar.com.br' + data.image,
           managerPassword: data.managerPassword
         }
         
