@@ -117,5 +117,17 @@ export default {
     }
 
     return Result.Success.SuccessOnSearch(res, result)
+  },
+
+  findAllPOS: async (req, res) => {
+    const pos = await Transaction.distinct('terminalCode', { 
+      loggedUserDocument: req.params.document
+    })
+
+    const result = {
+      pos
+    }
+
+    return Result.Success.SuccessOnSearch(res, result)
   }
 }

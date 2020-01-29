@@ -262,20 +262,28 @@ export default {
     const startAt = moment(req.query.startAt, 'DD/MM/YYYY HH:mm').format('YYYY-MM-DD HH:mm:ss.SSS')
     const endAt = moment(req.query.endAt, 'DD/MM/YYYY HH:mm').format('YYYY-MM-DD HH:mm:ss.SSS')
 
+    const terminalCode = req.query.terminalCode || ''
+
     let startAtObj = new Date(startAt)
     let endAtObj = new Date(endAt)
 
     startAtObj.setHours(startAtObj.getHours() - 2)
     endAtObj.setHours(endAtObj.getHours() - 2)
 
+    let matchPaymentMethod = {           
+      eventId: mongoose.Types.ObjectId(req.params.eventId),
+      loggedUserDocument: req.params.cpf,
+      canceledAt: null,
+      createdAt: { $gte: startAtObj, $lte: endAtObj },
+    }
+
+    if (!_.isEmpty(terminalCode)) {
+      matchPaymentMethod.terminalCode = terminalCode
+    }
+
     const queryPaymentMethod = await Transaction.aggregate([
       { 
-        $match: {           
-          eventId: mongoose.Types.ObjectId(req.params.eventId),
-          loggedUserDocument: req.params.cpf,
-          canceledAt: null,
-          createdAt: { $gte: startAtObj, $lte: endAtObj },
-        }
+        $match: matchPaymentMethod
       },
       {
         $group: {
@@ -286,14 +294,20 @@ export default {
       }
     ])
 
+    let matchCanceled = {           
+      eventId: mongoose.Types.ObjectId(req.params.eventId),
+      loggedUserDocument: req.params.cpf,
+      canceledAt: { $exists: true, $ne: null },
+      createdAt: { $gte: startAtObj, $lte: endAtObj }
+    }
+
+    if (!_.isEmpty(terminalCode)) {
+      matchCanceled.terminalCode = terminalCode
+    }
+
     const queryPaymentMethodCanceled = await Transaction.aggregate([
       { 
-        $match: {           
-          eventId: mongoose.Types.ObjectId(req.params.eventId),
-          loggedUserDocument: req.params.cpf,
-          canceledAt: { $exists: true, $ne: null },
-          createdAt: { $gte: startAtObj, $lte: endAtObj }
-        }
+        $match: matchCanceled
       },
       {
         $group: {
@@ -303,15 +317,21 @@ export default {
         }
       }
     ])
+
+    let matchProducts = { 
+      eventId: mongoose.Types.ObjectId(req.params.eventId),
+      loggedUserDocument: req.params.cpf,
+      canceledAt: null,
+      createdAt: { $gte: startAtObj, $lte: endAtObj }
+    }
+
+    if (!_.isEmpty(terminalCode)) {
+      matchProducts.terminalCode = terminalCode
+    }
     
     const queryProducts = await Transaction.aggregate([
       {
-        $match: { 
-          eventId: mongoose.Types.ObjectId(req.params.eventId),
-          loggedUserDocument: req.params.cpf,
-          canceledAt: null,
-          createdAt: { $gte: startAtObj, $lte: endAtObj }
-        }
+        $match: matchProducts
       },
       {
         $unwind: '$products'
@@ -340,14 +360,20 @@ export default {
       }
     ])
 
+    let matchProductsCanceled = { 
+      eventId: mongoose.Types.ObjectId(req.params.eventId),
+      loggedUserDocument: req.params.cpf,
+      canceledAt: { $exists: true, $ne: null },
+      createdAt: { $gte: startAtObj, $lte: endAtObj }
+    }
+
+    if (!_.isEmpty(terminalCode)) {
+      matchProductsCanceled.terminalCode = terminalCode
+    }
+
     const queryProductsCanceled = await Transaction.aggregate([
       {
-        $match: { 
-          eventId: mongoose.Types.ObjectId(req.params.eventId),
-          loggedUserDocument: req.params.cpf,
-          canceledAt: { $exists: true, $ne: null },
-          createdAt: { $gte: startAtObj, $lte: endAtObj }
-        }
+        $match: matchProductsCanceled
       },
       {
         $unwind: '$products'
