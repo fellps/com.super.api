@@ -26,7 +26,7 @@ app
   .use('/menus', VerifyJWT, Menu)
   .use('/products', VerifyJWT, Product)
   .use('/devices', VerifyJWT, Device)
-  .use('/reports', VerifyJWT, Report)
+  .use('/reports', Report)
   .use('/users', User)
   .use('/auth', Auth)
   .use('/pos', Decode, POS)

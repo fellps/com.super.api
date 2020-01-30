@@ -22,17 +22,49 @@ export default {
   // Sales summary report
   salesSummary: async (req, res) => {
     try {
+      const cpf = req.query.cpf || ''
+      const terminalCode = req.query.terminalCode || ''
+      
+      let startAt = moment(req.query.startAt, 'DD/MM/YYYY HH:mm').format('YYYY-MM-DD HH:mm:ss.SSS')
+      let endAt = moment(req.query.endAt, 'DD/MM/YYYY HH:mm').format('YYYY-MM-DD HH:mm:ss.SSS')
+
+      if (endAt === 'Invalid date') {
+        endAt = moment().format('YYYY-MM-DD HH:mm:ss.SSS')
+      }
+  
+      let startAtObj = new Date(startAt)
+      let endAtObj = new Date(endAt)
+
+      startAtObj.setHours(startAtObj.getHours() - 2)
+      endAtObj.setHours(endAtObj.getHours() - 2)
+      
+      let matchEvent = {    
+        eventId: mongoose.Types.ObjectId(req.params.eventId), 
+        canceledAt: null,
+      }
+
+      if (startAtObj.toString() !== 'Invalid Date') {
+        matchEvent.createdAt = { $gte: startAtObj, $lte: endAtObj }
+      }
+  
+      if (!_.isEmpty(cpf)) {
+        matchEvent.loggedUserDocument = cpf
+      }
+
+      if (!_.isEmpty(terminalCode)) {
+        matchEvent.terminalCode = terminalCode
+      }
+      
+
       const queryEvent = await Transaction.aggregate([
-        { $match: { eventId: mongoose.Types.ObjectId(req.params.eventId), canceledAt: null } },
+        { $match: matchEvent },
         { $group: { _id: null, totalEventAmount: { $sum: '$amount' }, totalTransactions: { $sum: 1 } } },
       ])
 
-      const queryPOS = await Transaction.distinct('deviceId', { 
-        eventId: mongoose.Types.ObjectId(req.params.eventId), canceledAt: null
-      })
+      const queryPOS = await Transaction.distinct('deviceId', matchEvent)
 
       const queryPaymentMethod = await Transaction.aggregate([
-        { $match: { eventId: mongoose.Types.ObjectId(req.params.eventId), canceledAt: null } },
+        { $match: matchEvent },
         {
           $group: {
             _id: {$toLower: '$paymentMethod'},
@@ -44,7 +76,7 @@ export default {
         
       const queryProducts = await Transaction.aggregate([
         {
-          $match: { 'eventId': mongoose.Types.ObjectId(req.params.eventId), 'canceledAt': null }
+          $match: matchEvent
         },
         {
           $unwind: '$products'
