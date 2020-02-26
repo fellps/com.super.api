@@ -19,7 +19,7 @@ export default {
 
     const user = new User({
       name: req.body.name,
-      cpf: req.body.cpf,
+      cpf: String(req.body.cpf).replace(/[^0-9]/gi, ''),
       birthdate: req.body.birthdate,
       email: req.body.email,
       phone: req.body.phone,
@@ -31,7 +31,8 @@ export default {
     user.save()
       .then(() => {
         return Result.Success.SuccessOnSave(res)
-      }).catch(() => {
+      }).catch((err) => {
+        console.log(err)
         return Result.Error.ErrorOnSave(res)
       })
   },
@@ -70,14 +71,24 @@ export default {
       return Result.Error.RequiredBody(res)
     }
 
-    User.findByIdAndUpdate(req.params.userId, {
+    let userData = {
       name: req.body.name,
-      cpf: req.body.cpf,
+      cpf: String(req.body.cpf).replace(/[^0-9]/gi, ''),
       birthdate: req.body.birthdate,
       email: req.body.email,
       phone: req.body.phone,
       isEnabled: req.body.isEnabled
-    }, { new: true })
+    }
+
+    if (req.body.password != void(0) && req.body.password.length > 0) {
+      const hash = Crypto.createHmac('sha256', process.env.PASSWORD_SECRET)
+        .update(req.body.password)
+        .digest('hex')
+
+      userData.password = hash
+    }
+
+    User.findByIdAndUpdate(req.params.userId, userData, { new: true })
       .then(user => {
         if(!user) {
           return Result.NotFound.NoRecordsFound(res)

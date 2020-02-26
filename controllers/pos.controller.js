@@ -43,7 +43,8 @@ export default {
           _id: data._id,
           name: data.name,
           image: 'https://api-prd.bdbar.com.br' + data.image,
-          managerPassword: data.managerPassword
+          managerPassword: data.managerPassword,
+          cashierClosingPassword: data.cashierClosingPassword
         }
         
         return Result.Success.SuccessOnSearch(res, result)

@@ -47,6 +47,7 @@ export default {
           addressNumber: req.body.addressNumber,
           description: req.body.description,
           managerPassword: req.body.managerPassword,
+          cashierClosingPassword: req.body.cashierClosingPassword,
           image: imagePath,
           isEnabled: true
         })
@@ -151,6 +152,7 @@ export default {
       'events.$.addressNumber': req.body.addressNumber,
       'events.$.description': req.body.description,
       'events.$.managerPassword': req.body.managerPassword,
+      'events.$.cashierClosingPassword': req.body.cashierClosingPassword,
       'events.$.isEnabled': req.body.isEnabled == 'true'
     })
       .then(producer => {
