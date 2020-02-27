@@ -129,12 +129,17 @@ export default {
         p['percent'] = parseInt((p.totalAmount / event.totalEventAmount) * 100)
         return p
       })
+
+      var totalProducts = products.reduce((total, element) => {
+        return total += element.totalCount
+      }, 0)
         
       const result = {
         eventId: producer.events[0]._id,
         eventName: producer.events[0].name,
         totalEventAmount: event.totalEventAmount,
         totalTransactions: event.totalTransactions,
+        totalProducts: totalProducts,
         totalPOS: queryPOS.length,
         paymentMethod: paymentMethod,
         productSummary: products
