@@ -132,6 +132,7 @@ export default {
 
   findAllPOS: async (req, res) => {
     const pos = await Transaction.distinct('terminalCode', { 
+      eventId: mongoose.Types.ObjectId(req.params.eventId),
       loggedUserDocument: req.params.document
     })
 

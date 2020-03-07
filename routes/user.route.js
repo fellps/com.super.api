@@ -8,7 +8,7 @@ app.get('/', verifyAdminJWT, user.findAll)
 app.post('/', user.create)
 app.get('/:userId', user.findOne)
 app.get('/cashiers/:eventId', user.findAllCashiers)
-app.get('/pos/:document', user.findAllPOS)
+app.get('/pos/:eventId/:document', user.findAllPOS)
 app.put('/:userId', user.update)
 app.delete('/:userId', user.delete)
 
