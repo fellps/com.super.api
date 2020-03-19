@@ -63,18 +63,31 @@ export default {
 
   // Find all events
   findAll: async (req, res) => {
-    Producer.find(Filter(req, {
-      //userId: req.userId,
+    const match = Filter(req, {
       events: {$exists: true, $not: {$size: 0}}
-    }))
-      .then(producers => {
-        let events = []
-        producers.forEach((producer) => {
-          producer.events.forEach(event => {
-            events.push(event)
-          })
-        })
-        return Result.Success.SuccessOnSearch(res, events)
+    })
+
+    Producer.aggregate([
+      { $match: match },
+      { $unwind: '$events' },
+      { $sort: { 'events.startDate': 1 }},
+      {
+        $group: {
+          _id: null,
+          events: {
+            $push: {
+              _id: '$events._id',
+              name: '$events.name',
+              address: '$events.address',
+              startDate: '$events.startDate'
+            }
+          }
+        }
+      }
+    ])
+      .then(events => {
+        const data = events.shift().events
+        return Result.Success.SuccessOnSearch(res, data)
       }).catch(err => {
         if(err.kind === 'ObjectId') {
           return Result.NotFound.NoRecordsFound(res)
