@@ -36,6 +36,8 @@ mongoose.connect(process.env.DB_HOST_DEV, {
   process.exit()
 })
 
+process.setMaxListeners(0)
+
 app.use('/', routes)
 // listen on port 3001
 app.listen(process.env.API_PORT, () => {
