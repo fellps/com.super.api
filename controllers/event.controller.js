@@ -2,7 +2,7 @@ import Producer from '../models/producer.model'
 import Result from '../modules/result'
 import Filter from '../modules/filterCreator'
 import _ from 'lodash'
-import MD5 from 'MD5'
+import MD5 from 'md5'
 
 export default {
   // Create event
