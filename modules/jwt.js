@@ -50,4 +50,20 @@ export const verifyAdminJWT = (req, res, next) => {
   })
 }
 
+export const verifyJWTExternal = (req, res, next) => {
+  var token = req.headers['x-access-token']
+  if (!token)
+    return Result.Unauthorized.RequiredAccessToken(res)
+
+  Jwt.verify(token, process.env.JWT_SECRET, function(err, decoded) {
+    if (err) 
+      return Result.NotFound.ErrorOnAccessToken(res)  
+
+    // se tudo estiver ok, salva no request para uso posterior
+
+    req.appId = decoded.id
+    next()
+  })
+}
+
 export default verifyJWT

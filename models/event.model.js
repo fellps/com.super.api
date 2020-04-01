@@ -4,6 +4,7 @@ import { ProductSchema } from './product.model'
 import { DeviceSchema } from './device.model'
 
 export const EventSchema = mongoose.Schema({
+  idExternal: String,
   name: String,
   startDate: Date,
   endDate: Date,
