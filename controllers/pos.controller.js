@@ -179,6 +179,8 @@ export default {
 
       let result = {}
 
+      result.dateTime = moment().tz('America/Sao_Paulo').format('YYYY-MM-DD HH:mm:ss.SSS Z')
+
       let menus = await Producer.aggregate([
         { $match: { 'events._id': mongoose.Types.ObjectId(getObjectIdFromGuid(req.body.IdEvent)) } },
         { $unwind: '$events' }, 
