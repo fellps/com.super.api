@@ -29,7 +29,7 @@ jobs:
     - name: Build project
       run: npm run build
     - name: Stop PM2
-      run: pm2 stop bdbar
+      run: pm2 stop index
       if: ${{failure()}}
     - name: Start PM2
-      run: pm2 start dist/index.js --name bdbar
+      run: pm2 start dist/index.js
