@@ -125,7 +125,7 @@ export default {
 
       const products = queryProducts.shift().products.map(p => {
         const product = producer.events[0].products.id(p.id)
-        p['name'] = product.name
+        p['name'] = product ? product.name : 'PRODUTO EXCLUÍDO'
         p['percent'] = parseInt((p.totalAmount / event.totalEventAmount) * 100)
         return p
       })
@@ -265,13 +265,13 @@ export default {
 
       const products = queryProducts.shift().products.map(p => {
         const product = producer.events[0].products.id(p.id)
-        p['name'] = product.name
+        p['name'] = product ? product.name : 'PRODUTO EXCLUÍDO'
         return p
       })
 
       const ordersDeliveredByUser = queryOrdersDeliveredByUser.shift().deliveries.map(p => {
         const product = producer.events[0].products.id(p.productId)
-        p['name'] = product.name
+        p['name'] = product ? product.name : 'PRODUTO EXCLUÍDO'
         return p
       })
 
@@ -447,13 +447,13 @@ export default {
 
     const products = queryProducts.length > 0 && queryProducts.shift().products.map(p => {
       const product = producer.events[0].products.id(p.id)
-      p['name'] = product.name
+      p['name'] = product ? product.name : 'PRODUTO EXCLUÍDO'
       return p
     })
 
     const productsCanceled = queryProductsCanceled.length > 0 && queryProductsCanceled.shift().products.map(p => {
       const product = producer.events[0].products.id(p.id)
-      p['name'] = product.name
+      p['name'] = product ? product.name : 'PRODUTO EXCLUÍDO'
       p['paymentMethod'] = getPaymentMethod(p.paymentMethod)
       return p
     })
@@ -627,13 +627,13 @@ export default {
 
     const products = queryProducts.length > 0 && queryProducts.shift().products.map(p => {
       const product = producer.events[0].products.id(p.id)
-      p['name'] = product.name
+      p['name'] = product ? product.name : 'PRODUTO EXCLUÍDO'
       return p
     })
 
     const productsCanceled = queryProductsCanceled.length > 0 && queryProductsCanceled.shift().products.map(p => {
       const product = producer.events[0].products.id(p.id)
-      p['name'] = product.name
+      p['name'] = product ? product.name : 'PRODUTO EXCLUÍDO'
       return p
     })
 
