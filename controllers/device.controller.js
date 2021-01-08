@@ -56,11 +56,12 @@ export default {
             acquirer: device.acquirer,
             isQRCodeEnabled: device.isQRCodeEnabled,
             menusIds: device.menusIds,
-            totalMenus: device.menusIds.length
+            totalMenus: device.menusIds ? device.menusIds.length : 0
           }
         }, [])
         return Result.Success.SuccessOnSearch(res, devices)
       }).catch(err => {
+        console.log(err)
         if(err.kind === 'ObjectId') {
           return Result.NotFound.NoRecordsFound(res)
         }
