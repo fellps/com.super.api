@@ -70,7 +70,7 @@ export default {
     Producer.aggregate([
       { $match: match },
       { $unwind: '$events' },
-      { $sort: { 'events.startDate': 1 }},
+      // { $sort: { 'events.startDate': 1 }},
       {
         $group: {
           _id: null,
