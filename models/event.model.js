@@ -21,7 +21,8 @@ export const EventSchema = mongoose.Schema({
   managerPassword: String,
   cashierClosingPassword: String,
   image: String,
-  isEnabled: Boolean
+  isEnabled: Boolean,
+  fromId: String,
 }, {
   timestamps: true
 })

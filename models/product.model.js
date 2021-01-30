@@ -5,7 +5,8 @@ export const ProductSchema = mongoose.Schema({
   name: String,
   value: Number, 
   count: Number,
-  color: String
+  color: String,
+  fromId: String,
 }, {
   timestamps: true
 })

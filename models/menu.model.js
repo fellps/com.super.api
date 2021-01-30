@@ -4,7 +4,8 @@ export const MenuSchema = mongoose.Schema({
   _id : { type : String, required : true },
   name: String,
   productsIds: [],
-  isEnabled: Boolean
+  isEnabled: Boolean,
+  fromId: String,
 }, {
   timestamps: true
 })

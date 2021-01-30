@@ -5,7 +5,8 @@ export const DeviceSchema = mongoose.Schema({
   menusIds: [],
   acquirer: String,
   isQRCodeEnabled: Boolean,
-  isEnabled: Boolean
+  isEnabled: Boolean,
+  fromId: String,
 }, {
   timestamps: true
 })

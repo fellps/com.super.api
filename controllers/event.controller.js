@@ -3,6 +3,9 @@ import Result from '../modules/result'
 import Filter from '../modules/filterCreator'
 import _ from 'lodash'
 import MD5 from 'md5'
+import moment from 'moment-timezone'
+import uuid from 'uuid'
+import mongoose from 'mongoose'
 
 export default {
   // Create event
@@ -59,6 +62,125 @@ export default {
         }
         return Result.Error.ErrorOnSearch(res)
       })
+  },
+
+  // Clone event
+  clone: async (req, res) => {
+    try {
+      const createdAt = moment().tz('America/Sao_Paulo').format('YYYY-MM-DD HH:mm:ss.SSS')
+      const producer = await Producer.findOne({
+        'events._id': req.params.eventId
+      }, 'events.$')
+
+      let event = producer.events.id(req.params.eventId)
+      event.producerId = producer._id
+
+      const products = event.products.map(product => {
+        return {
+          _id: uuid(),
+          fromId: product._id,
+          name: product.name,
+          color: product.color,
+          value: product.value,
+        }
+      })
+
+      const menus = event.menus.map(menu => {
+        const productsIds = menu.productsIds.map(productId => {
+          const product = products.filter(product => product.fromId == productId)
+          if (product.length) {
+            return product[0]._id
+          }
+        })
+        return {
+          _id: uuid(),
+          fromId: menu._id,
+          isEnabled: menu.isEnabled,
+          name: menu.name,
+          updatedAt: createdAt,
+          productsIds,
+        }
+      })
+
+      const devices = event.devices.map(device => {
+        const menusIds = device.menusIds.map(menuId => {
+          const menu = menus.filter(menu => menu.fromId == menuId)
+          if (menu.length) {
+            return menu[0]._id
+          }
+        })
+        return {
+          _id: mongoose.Types.ObjectId(),
+          fromId: device._id,
+          name: device.name,
+          acquirer: device.acquirer,
+          isEnabled: device.isEnabled,
+          isQRCodeEnabled: device.isQRCodeEnabled,
+          menusIds,
+        }
+      })
+
+      const newEvent = await Producer.findOne({
+        _id: event.producerId,
+      })
+
+      const newEventId = mongoose.Types.ObjectId()
+
+      newEvent.events.push({
+        _id: newEventId,
+        fromId: event._id,
+        name: `[CLONE] - ${event.name}`,
+        startDate: event.startDate,
+        endDate: event.endDate,
+        cep: event.cep,
+        state: event.state,
+        city: event.city,
+        address: event.address,
+        addressNumber: event.addressNumber,
+        description: event.description,
+        managerPassword: event.managerPassword,
+        cashierClosingPassword: event.cashierClosingPassword,
+        image: event.image,
+        isEnabled: true,
+        createdAt,
+        updatedAt: createdAt,
+      })
+      const eventSaved = await newEvent.save()
+
+      await Producer.updateOne({
+        'events._id': newEventId,
+      },
+      {
+        $set: {
+          'events.$.products': products
+        }
+      })
+
+      await Producer.updateOne({
+        'events._id': newEventId,
+      },
+      {
+        $set: {
+          'events.$.menus': menus
+        }
+      })
+
+      await Producer.updateOne({ 
+        'events._id': newEventId,
+      },
+      {
+        $set: {
+          'events.$.devices': devices
+        }
+      })
+
+      return Result.Success.SuccessOnSave(res, eventSaved)
+    } catch (err) {
+      if(err.kind === 'ObjectId') {
+        return Result.NotFound.NoRecordsFound(res)
+      }
+      return Result.Error.ErrorOnSave(res, err.message)
+    }
   },
 
   // Find all events
